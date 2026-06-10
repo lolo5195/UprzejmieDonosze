@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Formularz paragrafu</title>
+</head>
+<body>
+
+<h1 th:text="${paragraph.id == null ? 'Dodaj paragraf' : 'Edytuj paragraf'}"></h1>
+
+<form th:action="@{/paragraphs/save}" th:object="${paragraph}" method="post">
+
+  <input type="hidden" th:field="*{id}">
+
+  <div>
+    <label for="title">Nazwa paragrafu:</label>
+    <input id="title" type="text" th:field="*{title}">
+    <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+  </div>
+
+  <div>
+    <label for="description">Opis:</label>
+    <textarea id="description" th:field="*{description}"></textarea>
+    <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+  </div>
+
+  <div>
+    <label for="severity">Waga przewinienia 1-10:</label>
+    <input id="severity" type="number" th:field="*{severity}">
+    <div th:if="${#fields.hasErrors('severity')}" th:errors="*{severity}"></div>
+  </div>
+
+  <div>
+    <label for="active">Aktywny:</label>
+    <input id="active" type="checkbox" th:field="*{active}">
+  </div>
+
+  <button type="submit">Zapisz</button>
+</form>
+
+<a th:href="@{/paragraphs}">Powrót do listy</a>
+
+</body>
+</html>
