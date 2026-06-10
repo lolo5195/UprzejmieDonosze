@@ -1,0 +1,33 @@
+Table app_users {
+  id number [pk]
+  username varchar(30) [not null, unique]
+  password varchar(255) [not null]
+  first_name varchar(30) [not null]
+  last_name varchar(50) [not null]
+  role varchar(20) [not null, note: 'ADMIN, USER, GUEST']
+  created_at date
+}
+
+Table paragraphs {
+  id number [pk]
+  title varchar(60) [not null]
+  description varchar(500) [not null]
+  severity number [not null, note: '1-10']
+  active boolean [not null]
+}
+
+Table reports {
+  id number [pk]
+  title varchar(80) [not null]
+  description varchar(1000) [not null]
+  accused_student_name varchar(80) [not null]
+  event_date date
+  created_at date
+  status varchar(20) [not null, note: 'NEW, ACCEPTED, REJECTED']
+  share_token varchar(255) [unique]
+  author_id number
+  paragraph_id number
+}
+
+Ref: reports.author_id > app_users.id
+Ref: reports.paragraph_id > paragraphs.id
