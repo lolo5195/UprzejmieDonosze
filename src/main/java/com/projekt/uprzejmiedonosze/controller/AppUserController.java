@@ -1,6 +1,6 @@
 package com.projekt.uprzejmiedonosze.controller;
 
-import java.time.LocalDate;
+import com.projekt.uprzejmiedonosze.dto.AppUserForm;
 import com.projekt.uprzejmiedonosze.model.AppUser;
 import com.projekt.uprzejmiedonosze.model.Role;
 import com.projekt.uprzejmiedonosze.repository.AppUserRepository;
@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/users")
@@ -28,26 +30,23 @@ public class AppUserController {
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        model.addAttribute("user", new AppUser());
-        model.addAttribute("roles", Role.values());
+        model.addAttribute("userForm", new AppUserForm());
+        addFormLists(model);
         return "users/form";
     }
 
     @PostMapping("/save")
     public String saveUser(
-            @Valid @ModelAttribute("user") AppUser user,
+            @Valid @ModelAttribute("userForm") AppUserForm userForm,
             BindingResult bindingResult,
             Model model
     ) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("roles", Role.values());
+            addFormLists(model);
             return "users/form";
         }
 
-        if (user.getCreatedAt() == null) {
-            user.setCreatedAt(LocalDate.now());
-        }
-
+        AppUser user = toEntity(userForm);
         appUserRepository.save(user);
         return "redirect:/users";
     }
@@ -57,8 +56,8 @@ public class AppUserController {
         AppUser user = appUserRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o id: " + id));
 
-        model.addAttribute("user", user);
-        model.addAttribute("roles", Role.values());
+        model.addAttribute("userForm", toForm(user));
+        addFormLists(model);
         return "users/form";
     }
 
@@ -66,5 +65,43 @@ public class AppUserController {
     public String deleteUser(@PathVariable Long id) {
         appUserRepository.deleteById(id);
         return "redirect:/users";
+    }
+
+    private void addFormLists(Model model) {
+        model.addAttribute("roles", Role.values());
+    }
+
+    private AppUserForm toForm(AppUser user) {
+        AppUserForm form = new AppUserForm();
+        form.setId(user.getId());
+        form.setUsername(user.getUsername());
+        form.setPassword(user.getPassword());
+        form.setFirstName(user.getFirstName());
+        form.setLastName(user.getLastName());
+        form.setRole(user.getRole());
+        return form;
+    }
+
+    private AppUser toEntity(AppUserForm form) {
+        AppUser user;
+
+        if (form.getId() != null) {
+            user = appUserRepository.findById(form.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o id: " + form.getId()));
+        } else {
+            user = new AppUser();
+        }
+
+        user.setUsername(form.getUsername());
+        user.setPassword(form.getPassword());
+        user.setFirstName(form.getFirstName());
+        user.setLastName(form.getLastName());
+        user.setRole(form.getRole() != null ? form.getRole() : Role.USER);
+
+        if (user.getCreatedAt() == null) {
+            user.setCreatedAt(LocalDate.now());
+        }
+
+        return user;
     }
 }

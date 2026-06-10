@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista donosów</title>
+</head>
+<body>
+
+<h1>Lista donosów</h1>
+
+<a th:href="@{/reports/new}">Dodaj nowy donos</a>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Tytuł</th>
+        <th>Zgłaszany student</th>
+        <th>Paragraf</th>
+        <th>Autor</th>
+        <th>Data zdarzenia</th>
+        <th>Status</th>
+        <th>Akcje</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="report : ${reports}">
+        <td th:text="${report.id}"></td>
+        <td th:text="${report.title}"></td>
+        <td th:text="${report.accusedStudentName}"></td>
+        <td th:text="${report.paragraph != null ? report.paragraph.title : '-'}"></td>
+        <td th:text="${report.author != null ? report.author.username : '-'}"></td>
+        <td th:text="${report.eventDate}"></td>
+        <td th:text="${report.status}"></td>
+        <td>
+            <a th:href="@{/reports/{id}/edit(id=${report.id})}">Edytuj</a>
+            |
+            <a th:href="@{/reports/{id}/delete(id=${report.id})}"
+               onclick="return confirm('Na pewno usunąć donos?')">Usuń</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<br>
+<a th:href="@{/users}">Przejdź do użytkowników</a>
+|
+<a th:href="@{/paragraphs}">Przejdź do paragrafów</a>
+
+</body>
+</html>
