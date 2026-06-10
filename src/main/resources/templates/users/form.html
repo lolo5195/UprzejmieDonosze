@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formularz użytkownika</title>
+</head>
+<body>
+
+<h1 th:text="${user.id == null ? 'Dodaj użytkownika' : 'Edytuj użytkownika'}"></h1>
+
+<form th:action="@{/users/save}" th:object="${user}" method="post">
+
+    <input type="hidden" th:field="*{id}">
+
+    <div>
+        <label for="username">Login:</label>
+        <input id="username" type="text" th:field="*{username}">
+        <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+    </div>
+
+    <div>
+        <label for="password">Hasło:</label>
+        <input id="password" type="text" th:field="*{password}">
+        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+    </div>
+
+    <div>
+        <label for="firstName">Imię:</label>
+        <input id="firstName" type="text" th:field="*{firstName}">
+        <div th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+    </div>
+
+    <div>
+        <label for="lastName">Nazwisko:</label>
+        <input id="lastName" type="text" th:field="*{lastName}">
+        <div th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+    </div>
+
+    <div>
+        <label for="role">Rola:</label>
+        <select id="role" th:field="*{role}">
+            <option th:each="role : ${roles}"
+                    th:value="${role}"
+                    th:text="${role}">
+            </option>
+        </select>
+        <div th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
+    </div>
+
+
+
+    <button type="submit">Zapisz</button>
+</form>
+
+<br>
+<a th:href="@{/users}">Powrót do listy użytkowników</a>
+
+</body>
+</html>
