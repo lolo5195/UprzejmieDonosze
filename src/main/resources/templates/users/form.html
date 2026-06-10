@@ -6,9 +6,9 @@
 </head>
 <body>
 
-<h1 th:text="${user.id == null ? 'Dodaj użytkownika' : 'Edytuj użytkownika'}"></h1>
+<h1 th:text="${userForm.id == null ? 'Dodaj użytkownika' : 'Edytuj użytkownika'}"></h1>
 
-<form th:action="@{/users/save}" th:object="${user}" method="post">
+<form th:action="@{/users/save}" th:object="${userForm}" method="post">
 
     <input type="hidden" th:field="*{id}">
 

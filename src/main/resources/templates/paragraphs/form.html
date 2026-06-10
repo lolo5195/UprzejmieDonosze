@@ -6,9 +6,9 @@
 </head>
 <body>
 
-<h1 th:text="${paragraph.id == null ? 'Dodaj paragraf' : 'Edytuj paragraf'}"></h1>
+<h1 th:text="${paragraphForm.id == null ? 'Dodaj paragraf' : 'Edytuj paragraf'}"></h1>
 
-<form th:action="@{/paragraphs/save}" th:object="${paragraph}" method="post">
+<form th:action="@{/paragraphs/save}" th:object="${paragraphForm}" method="post">
 
   <input type="hidden" th:field="*{id}">
 
