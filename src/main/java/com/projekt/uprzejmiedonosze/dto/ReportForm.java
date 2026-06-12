@@ -32,6 +32,7 @@ public class ReportForm {
     private String accusedStudentName;
 
     @PastOrPresent(message = "Data przewinienia nie może być z przyszłości")
+    @NotNull(message = "Data nie może być pusta")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate eventDate;
 

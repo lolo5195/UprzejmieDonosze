@@ -34,9 +34,11 @@ public class Report {
     private String accusedStudentName;
 
     @PastOrPresent(message = "Data przewinienia nie może być z przyszłości")
+    @NotNull(message = "Data nie może być pusta")
     private LocalDate eventDate;
 
     @PastOrPresent
+    @NotNull(message = "Data nie może być pusta")
     private LocalDate createdAt = LocalDate.now();
 
     @Enumerated(EnumType.STRING)
