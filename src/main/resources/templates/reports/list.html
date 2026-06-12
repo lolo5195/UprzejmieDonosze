@@ -34,6 +34,8 @@
         <td th:text="${report.eventDate}"></td>
         <td th:text="${report.status}"></td>
         <td>
+            <a th:href="@{/reports/{id}(id=${report.id})}">Szczegóły</a>
+            |
             <a th:href="@{/reports/{id}/edit(id=${report.id})}">Edytuj</a>
             |
             <a th:href="@{/reports/{id}/delete(id=${report.id})}"

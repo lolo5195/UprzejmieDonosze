@@ -79,6 +79,15 @@ public class ReportController {
         return "redirect:/reports";
     }
 
+    @GetMapping("{id}")
+    public String showReportDetails(@PathVariable Long id, Model model) {
+        Report report = reportRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono donosu o id: " + id));
+
+        model.addAttribute("report", report);
+        return "reports/detail";
+    }
+
     private void addFormLists(Model model) {
         model.addAttribute("authors", appUserRepository.findAll());
         model.addAttribute("paragraphs", paragraphRepository.findAll());
