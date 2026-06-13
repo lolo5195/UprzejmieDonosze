@@ -64,7 +64,7 @@ public class AppUserController {
         return "users/form";
     }
 
-    @GetMapping("/{id}/delete")
+    @PostMapping("/{id}/delete")
     public String deleteUser(@PathVariable Long id) {
         appUserRepository.deleteById(id);
         return "redirect:/users";

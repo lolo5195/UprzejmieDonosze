@@ -73,7 +73,7 @@ public class ReportController {
         return "reports/form";
     }
 
-    @GetMapping("/{id}/delete")
+    @PostMapping("/{id}/delete")
     public String deleteReport(@PathVariable Long id) {
         reportRepository.deleteById(id);
         return "redirect:/reports";

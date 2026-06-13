@@ -35,9 +35,12 @@
                     <ul class="action-list">
                         <li><a th:href="@{/paragraphs/{id}/edit(id=${paragraph.id})}">Edytuj</a></li>
                         <li>
-                            <a class="btn btn-danger"
-                               th:href="@{/paragraphs/{id}/delete(id=${paragraph.id})}"
-                               onclick="return confirm('Na pewno usunąć paragraf?')">Usuń</a>
+                            <form class="delete-form"
+                                  th:action="@{/paragraphs/{id}/delete(id=${paragraph.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('Na pewno usunąć paragraf?')">
+                                <button class="btn btn-danger" type="submit">Usuń</button>
+                            </form>
                         </li>
                     </ul>
                 </td>

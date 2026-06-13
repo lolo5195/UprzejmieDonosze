@@ -140,6 +140,7 @@ button {
     color: var(--white);
     cursor: pointer;
     display: inline-block;
+    font-family: "Courier New", ui-monospace, monospace;
     font-weight: 700;
     padding: .6rem 1rem;
     text-decoration: none;
@@ -164,6 +165,10 @@ button:hover {
 
 .btn-link {
     padding: .35rem .65rem;
+}
+
+.delete-form {
+    margin: 0;
 }
 
 .table-wrap {

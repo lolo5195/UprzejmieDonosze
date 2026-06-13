@@ -33,9 +33,12 @@
                     <ul class="action-list">
                         <li><a th:href="@{/users/{id}/edit(id=${user.id})}">Edytuj</a></li>
                         <li>
-                            <a class="btn btn-danger"
-                               th:href="@{/users/{id}/delete(id=${user.id})}"
-                               onclick="return confirm('Na pewno usunąć użytkownika?')">Usuń</a>
+                            <form class="delete-form"
+                                  th:action="@{/users/{id}/delete(id=${user.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('Na pewno usunąć użytkownika?')">
+                                <button class="btn btn-danger" type="submit">Usuń</button>
+                            </form>
                         </li>
                     </ul>
                 </td>

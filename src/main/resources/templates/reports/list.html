@@ -40,9 +40,12 @@
                         <li><a th:href="@{/reports/{id}(id=${report.id})}">Szczegóły</a></li>
                         <li><a th:href="@{/reports/{id}/edit(id=${report.id})}">Edytuj</a></li>
                         <li>
-                            <a class="btn btn-danger"
-                               th:href="@{/reports/{id}/delete(id=${report.id})}"
-                               onclick="return confirm('Na pewno usunąć donos?')">Usuń</a>
+                            <form class="delete-form"
+                                  th:action="@{/reports/{id}/delete(id=${report.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('Na pewno usunąć donos?')">
+                                <button class="btn btn-danger" type="submit">Usuń</button>
+                            </form>
                         </li>
                     </ul>
                 </td>
