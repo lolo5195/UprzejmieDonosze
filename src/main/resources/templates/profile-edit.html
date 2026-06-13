@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edycja profilu - Uprzejmie Donoszę</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<a class="skip-link" href="#main">Przejdź do treści</a>
+<header>
+    <p class="stamp">aktualizacja akt</p>
+    <h1>Edycja profilu</h1>
+    <nav aria-label="Nawigacja główna">
+        <ul>
+            <li><a th:href="@{/profile}">Powrót do profilu</a></li>
+            <li><a th:href="@{/}">Strona główna</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main id="main">
+    <section class="card" th:object="${profileForm}">
+        <div class="alert alert-error" role="alert" th:if="${#fields.hasAnyErrors()}">
+            Formularz zawiera błędy. Popraw pola oznaczone komunikatem.
+        </div>
+
+        <form th:action="@{/profile/edit}" method="post">
+            <div class="form-field">
+                <label for="firstName">Imię</label>
+                <input id="firstName" type="text" th:field="*{firstName}" autocomplete="given-name">
+                <div class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+            </div>
+
+            <div class="form-field">
+                <label for="lastName">Nazwisko</label>
+                <input id="lastName" type="text" th:field="*{lastName}" autocomplete="family-name">
+                <div class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+            </div>
+
+            <button type="submit">Zapisz dane</button>
+        </form>
+    </section>
+</main>
+
+<footer>
+    <p>Uprzejmie Donoszę</p>
+</footer>
+</body>
+</html>
