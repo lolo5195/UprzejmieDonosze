@@ -35,7 +35,11 @@ public class RegistrationService {
         user.setRole(Role.USER);
         user.setCreatedAt(LocalDate.now());
 
-        return appUserRepository.save(user);
+        try {
+            return appUserRepository.save(user);
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            throw new UsernameAlreadyTakenException();
+        }
     }
 
     public static class UsernameAlreadyTakenException extends RuntimeException {
