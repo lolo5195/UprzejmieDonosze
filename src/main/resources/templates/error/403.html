@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Brak dostępu - Uprzejmie Donoszę</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<a class="skip-link" href="#main">Przejdź do treści</a>
+<header>
+    <p class="stamp">odmowa</p>
+    <h1>Brak dostępu</h1>
+</header>
+
+<main id="main">
+    <section class="card">
+        <p>Nie masz uprawnień do tej części akt.</p>
+        <p><a class="btn" th:href="@{/}">Wróć na stronę główną</a></p>
+    </section>
+</main>
+
+<footer>
+    <p>Uprzejmie Donoszę</p>
+</footer>
+</body>
+</html>

@@ -5,6 +5,7 @@ import com.projekt.uprzejmiedonosze.model.AppUser;
 import com.projekt.uprzejmiedonosze.model.Role;
 import com.projekt.uprzejmiedonosze.repository.AppUserRepository;
 import jakarta.validation.Valid;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,9 +18,11 @@ import java.time.LocalDate;
 public class AppUserController {
 
     private final AppUserRepository appUserRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public AppUserController(AppUserRepository appUserRepository) {
+    public AppUserController(AppUserRepository appUserRepository, PasswordEncoder passwordEncoder) {
         this.appUserRepository = appUserRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
@@ -75,7 +78,7 @@ public class AppUserController {
         AppUserForm form = new AppUserForm();
         form.setId(user.getId());
         form.setUsername(user.getUsername());
-        form.setPassword(user.getPassword());
+        form.setPassword("");
         form.setFirstName(user.getFirstName());
         form.setLastName(user.getLastName());
         form.setRole(user.getRole());
@@ -93,7 +96,7 @@ public class AppUserController {
         }
 
         user.setUsername(form.getUsername());
-        user.setPassword(form.getPassword());
+        user.setPassword(passwordEncoder.encode(form.getPassword()));
         user.setFirstName(form.getFirstName());
         user.setLastName(form.getLastName());
         user.setRole(form.getRole() != null ? form.getRole() : Role.USER);

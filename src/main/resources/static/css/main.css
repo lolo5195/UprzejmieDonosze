@@ -1,0 +1,128 @@
+:root {
+    --paper: #f5f1e6;
+    --paper-dark: #e8e2d0;
+    --ink: #1f1b16;
+    --brown: #5b3a1a;
+    --red: #a4161a;
+    --white: #fffdf7;
+}
+
+body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+    line-height: 1.5;
+}
+
+header,
+main,
+footer {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+header {
+    border-bottom: 3px double var(--brown);
+}
+
+h1,
+h2,
+label,
+.stamp {
+    font-family: "Courier New", ui-monospace, monospace;
+}
+
+nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    padding: 0;
+    list-style: none;
+}
+
+a {
+    color: var(--brown);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+    outline: 3px solid var(--red);
+    outline-offset: 3px;
+}
+
+.card {
+    background: var(--white);
+    border: 1px solid var(--brown);
+    box-shadow: 0 4px 0 rgba(91, 58, 26, .2);
+    margin: 1rem 0;
+    padding: 1rem;
+}
+
+.form-field {
+    margin-bottom: 1rem;
+}
+
+.form-field label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: .25rem;
+}
+
+.form-field input {
+    box-sizing: border-box;
+    max-width: 28rem;
+    width: 100%;
+    border: 1px solid var(--brown);
+    padding: .55rem;
+}
+
+.btn,
+button {
+    background: var(--brown);
+    border: 0;
+    color: var(--white);
+    cursor: pointer;
+    display: inline-block;
+    font: 700 1rem "Courier New", ui-monospace, monospace;
+    padding: .6rem 1rem;
+    text-decoration: none;
+}
+
+.alert {
+    background: var(--paper-dark);
+    border-left: .35rem solid var(--brown);
+    margin: 1rem 0;
+    padding: .75rem 1rem;
+}
+
+.alert-error,
+.field-error {
+    color: var(--red);
+    font-weight: 700;
+}
+
+.stamp {
+    border: .2rem solid var(--red);
+    color: var(--red);
+    display: inline-block;
+    font-weight: 700;
+    padding: .2rem .45rem;
+    text-transform: uppercase;
+    transform: rotate(-2deg);
+}
+
+.skip-link {
+    background: var(--ink);
+    color: var(--white);
+    left: 1rem;
+    padding: .5rem;
+    position: absolute;
+    top: -4rem;
+}
+
+.skip-link:focus {
+    top: 1rem;
+}

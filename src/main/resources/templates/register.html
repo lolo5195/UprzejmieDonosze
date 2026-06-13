@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Rejestracja - Uprzejmie Donoszę</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<a class="skip-link" href="#main">Przejdź do treści</a>
+<header>
+    <p class="stamp">nowa kartoteka</p>
+    <h1>Rejestracja użytkownika</h1>
+    <nav aria-label="Nawigacja główna">
+        <ul>
+            <li><a th:href="@{/}">Strona główna</a></li>
+            <li><a th:href="@{/login}">Logowanie</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main id="main">
+    <section class="card" th:object="${registerForm}">
+        <div class="alert alert-error" role="alert" th:if="${#fields.hasAnyErrors()}">
+            Formularz zawiera błędy. Popraw pola oznaczone komunikatem.
+        </div>
+
+        <form th:action="@{/register}" method="post">
+            <div class="form-field">
+                <label for="username">Login</label>
+                <input id="username" type="text" th:field="*{username}" autocomplete="username">
+                <div class="field-error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+            </div>
+
+            <div class="form-field">
+                <label for="password">Hasło</label>
+                <input id="password" type="password" th:field="*{password}" autocomplete="new-password">
+                <div class="field-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+            </div>
+
+            <div class="form-field">
+                <label for="confirmPassword">Powtórz hasło</label>
+                <input id="confirmPassword" type="password" th:field="*{confirmPassword}" autocomplete="new-password">
+                <div class="field-error" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+            </div>
+
+            <div class="form-field">
+                <label for="firstName">Imię</label>
+                <input id="firstName" type="text" th:field="*{firstName}" autocomplete="given-name">
+                <div class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+            </div>
+
+            <div class="form-field">
+                <label for="lastName">Nazwisko</label>
+                <input id="lastName" type="text" th:field="*{lastName}" autocomplete="family-name">
+                <div class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+            </div>
+
+            <button type="submit">Utwórz konto</button>
+        </form>
+    </section>
+</main>
+
+<footer>
+    <p>Uprzejmie Donoszę</p>
+</footer>
+</body>
+</html>
