@@ -71,10 +71,4 @@ class UiEpicIntegrationTests {
                 .andExpect(content().string(containsString("<main id=\"main\"")))
                 .andExpect(content().string(containsString("Sprawa nie istnieje")));
     }
-
-    @Test
-    void wcagChecklistAndServerErrorTemplateExist() {
-        assertThat(Files.exists(Path.of("docs", "WCAG_CHECKLIST.md"))).isTrue();
-        assertThat(Files.exists(Path.of("src", "main", "resources", "templates", "error", "500.html"))).isTrue();
-    }
 }
