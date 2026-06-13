@@ -1,53 +1,48 @@
 <!DOCTYPE html>
-<html lang="pl" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Lista użytkowników</title>
-</head>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Lista użytkowników', 'kartoteka osób', ~{::section})}">
 <body>
+<section class="card">
+    <p><a class="btn" th:href="@{/users/new}">Dodaj użytkownika</a></p>
 
-<h1>Lista użytkowników</h1>
+    <div class="table-wrap">
+        <table class="table">
+            <caption>Konta użytkowników systemu</caption>
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Login</th>
+                <th scope="col">Imię</th>
+                <th scope="col">Nazwisko</th>
+                <th scope="col">Rola</th>
+                <th scope="col">Data utworzenia</th>
+                <th scope="col">Akcje</th>
+            </tr>
+            </thead>
 
-<a th:href="@{/users/new}">Dodaj użytkownika</a>
-<br><br>
-
-<table border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Login</th>
-        <th>Imię</th>
-        <th>Nazwisko</th>
-        <th>Rola</th>
-        <th>Data utworzenia</th>
-        <th>Akcje</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    <tr th:each="user : ${users}">
-        <td th:text="${user.id}"></td>
-        <td th:text="${user.username}"></td>
-        <td th:text="${user.firstName}"></td>
-        <td th:text="${user.lastName}"></td>
-        <td th:text="${user.role}"></td>
-        <td th:text="${user.createdAt}"></td>
-        <td>
-            <a th:href="@{/users/{id}/edit(id=${user.id})}">Edytuj</a>
-            |
-            <a th:href="@{/users/{id}/delete(id=${user.id})}"
-               onclick="return confirm('Na pewno usunąć użytkownika?')">Usuń</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
-
-<br>
-<a th:href="@{/paragraphs}">Przejdź do paragrafów</a>
-|
-<a th:href="@{/reports}">Przejdź do donosów</a>
-|
-<a th:href="@{/}">Strona główna</a>
-
+            <tbody>
+            <tr th:each="user : ${users}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.username}"></td>
+                <td th:text="${user.firstName}"></td>
+                <td th:text="${user.lastName}"></td>
+                <td><span class="badge-status" th:text="${user.role}"></span></td>
+                <td th:text="${user.createdAt}"></td>
+                <td>
+                    <ul class="action-list">
+                        <li><a th:href="@{/users/{id}/edit(id=${user.id})}">Edytuj</a></li>
+                        <li>
+                            <a class="btn btn-danger"
+                               th:href="@{/users/{id}/delete(id=${user.id})}"
+                               onclick="return confirm('Na pewno usunąć użytkownika?')">Usuń</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
 </body>
 </html>

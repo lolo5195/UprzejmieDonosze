@@ -1,44 +1,24 @@
 <!DOCTYPE html>
-<html lang="pl" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <meta charset="UTF-8">
-    <title>Uprzejmie Donoszę</title>
-    <link rel="stylesheet" th:href="@{/css/main.css}">
-</head>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{fragments/layout :: page('Uprzejmie Donoszę', 'wydział donosów', ~{::section})}">
 <body>
-<a class="skip-link" href="#main">Przejdź do treści</a>
-<header>
-    <p class="stamp">wydział donosów</p>
-    <h1>Uprzejmie Donoszę</h1>
-    <p>Aplikacja webowa do zgłaszania zachowań i przewinień studentów.</p>
+<section class="card">
+    <h2>Panel spraw</h2>
+    <p>Aplikacja webowa do zgłaszania zachowań i przewinień studentów w stylu urzędowej kartoteki.</p>
+    <p sec:authorize="isAnonymous()">Załóż konto albo zaloguj się, aby składać i przeglądać donosy.</p>
+    <p sec:authorize="isAuthenticated()">Jesteś zalogowany jako <strong sec:authentication="name"></strong>.</p>
+    <ul class="action-list">
+        <li sec:authorize="isAnonymous()"><a class="btn" th:href="@{/login}">Logowanie</a></li>
+        <li sec:authorize="isAnonymous()"><a class="btn btn-secondary" th:href="@{/register}">Rejestracja</a></li>
+        <li sec:authorize="isAuthenticated()"><a class="btn" th:href="@{/reports}">Przejdź do donosów</a></li>
+    </ul>
+</section>
 
-    <nav aria-label="Nawigacja główna">
-        <ul>
-            <li sec:authorize="isAnonymous()"><a th:href="@{/login}">Logowanie</a></li>
-            <li sec:authorize="isAnonymous()"><a th:href="@{/register}">Rejestracja</a></li>
-            <li sec:authorize="isAuthenticated()"><a th:href="@{/reports}">Donosy</a></li>
-            <li sec:authorize="isAuthenticated()"><a th:href="@{/profile}">Profil</a></li>
-            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/users}">Użytkownicy</a></li>
-            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/paragraphs}">Paragrafy</a></li>
-            <li sec:authorize="isAuthenticated()">
-                <form th:action="@{/logout}" method="post">
-                    <button type="submit">Wyloguj</button>
-                </form>
-            </li>
-        </ul>
-    </nav>
-</header>
-
-<main id="main">
-    <section class="card">
-        <h2>Panel spraw</h2>
-        <p sec:authorize="isAnonymous()">Załóż konto albo zaloguj się, aby składać i przeglądać donosy.</p>
-        <p sec:authorize="isAuthenticated()">Jesteś zalogowany jako <strong sec:authentication="name"></strong>.</p>
-    </section>
-</main>
-
-<footer>
-    <p>Uprzejmie Donoszę</p>
-</footer>
+<section class="card card-muted">
+    <h2>Jak działa kartoteka?</h2>
+    <p>Wybierz paragraf, opisz zdarzenie i zachowaj zgłoszenie w rejestrze. Administrator zarządza użytkownikami oraz katalogiem paragrafów.</p>
+</section>
 </body>
 </html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="page(pageTitle, stampText, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${pageTitle + ' - Uprzejmie Donoszę'}">Uprzejmie Donoszę</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+</head>
+<body>
+<a class="skip-link" href="#main">Przejdź do treści</a>
+
+<header class="site-header">
+    <p class="stamp" th:text="${stampText}">akta sprawy</p>
+    <h1 th:text="${pageTitle}">Uprzejmie Donoszę</h1>
+
+    <nav class="main-nav" aria-label="Nawigacja główna">
+        <ul>
+            <li><a th:href="@{/}">Strona główna</a></li>
+            <li sec:authorize="isAnonymous()"><a th:href="@{/login}">Logowanie</a></li>
+            <li sec:authorize="isAnonymous()"><a th:href="@{/register}">Rejestracja</a></li>
+            <li sec:authorize="isAuthenticated()"><a th:href="@{/reports}">Donosy</a></li>
+            <li sec:authorize="isAuthenticated()"><a th:href="@{/profile}">Profil</a></li>
+            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/users}">Użytkownicy</a></li>
+            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/paragraphs}">Paragrafy</a></li>
+            <li sec:authorize="isAuthenticated()">
+                <form class="nav-form" th:action="@{/logout}" method="post">
+                    <button class="btn btn-link" type="submit">Wyloguj</button>
+                </form>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<main id="main" class="site-main">
+    <th:block th:replace="${content}">
+        <section class="card">
+            <p>Brak treści strony.</p>
+        </section>
+    </th:block>
+</main>
+
+<footer class="site-footer">
+    <p>Uprzejmie Donoszę &middot; elektroniczna kartoteka przewinień</p>
+</footer>
+</body>
+</html>

@@ -1,56 +1,55 @@
 <!DOCTYPE html>
-<html lang="pl" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Lista donosów</title>
-</head>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Lista donosów', 'rejestr donosów', ~{::section})}">
 <body>
+<section class="card">
+    <p><a class="btn" th:href="@{/reports/new}">Dodaj nowy donos</a></p>
 
-<h1>Lista donosów</h1>
+    <div class="table-wrap">
+        <table class="table">
+            <caption>Rejestr złożonych donosów</caption>
+            <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Tytuł</th>
+                <th scope="col">Zgłaszany student</th>
+                <th scope="col">Paragraf</th>
+                <th scope="col">Autor</th>
+                <th scope="col">Data zdarzenia</th>
+                <th scope="col">Status</th>
+                <th scope="col">Akcje</th>
+            </tr>
+            </thead>
 
-<a th:href="@{/reports/new}">Dodaj nowy donos</a>
-
-<table border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Tytuł</th>
-        <th>Zgłaszany student</th>
-        <th>Paragraf</th>
-        <th>Autor</th>
-        <th>Data zdarzenia</th>
-        <th>Status</th>
-        <th>Akcje</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    <tr th:each="report : ${reports}">
-        <td th:text="${report.id}"></td>
-        <td th:text="${report.title}"></td>
-        <td th:text="${report.accusedStudentName}"></td>
-        <td th:text="${report.paragraph != null ? report.paragraph.title : '-'}"></td>
-        <td th:text="${report.author != null ? report.author.username : '-'}"></td>
-        <td th:text="${report.eventDate}"></td>
-        <td th:text="${report.status}"></td>
-        <td>
-            <a th:href="@{/reports/{id}(id=${report.id})}">Szczegóły</a>
-            |
-            <a th:href="@{/reports/{id}/edit(id=${report.id})}">Edytuj</a>
-            |
-            <a th:href="@{/reports/{id}/delete(id=${report.id})}"
-               onclick="return confirm('Na pewno usunąć donos?')">Usuń</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
-
-<br>
-<a th:href="@{/users}">Przejdź do użytkowników</a>
-|
-<a th:href="@{/paragraphs}">Przejdź do paragrafów</a>
-|
-<a th:href="@{/}">Strona główna</a>
-
+            <tbody>
+            <tr th:each="report : ${reports}">
+                <td th:text="${report.id}"></td>
+                <td th:text="${report.title}"></td>
+                <td th:text="${report.accusedStudentName}"></td>
+                <td th:text="${report.paragraph != null ? report.paragraph.title : '-'}"></td>
+                <td th:text="${report.author != null ? report.author.username : '-'}"></td>
+                <td th:text="${report.eventDate}"></td>
+                <td>
+                    <span class="badge-status"
+                          th:classappend="${report.status != null ? report.status.name().toLowerCase() : ''}"
+                          th:text="${report.status}"></span>
+                </td>
+                <td>
+                    <ul class="action-list">
+                        <li><a th:href="@{/reports/{id}(id=${report.id})}">Szczegóły</a></li>
+                        <li><a th:href="@{/reports/{id}/edit(id=${report.id})}">Edytuj</a></li>
+                        <li>
+                            <a class="btn btn-danger"
+                               th:href="@{/reports/{id}/delete(id=${report.id})}"
+                               onclick="return confirm('Na pewno usunąć donos?')">Usuń</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
 </body>
 </html>

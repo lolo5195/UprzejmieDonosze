@@ -1,68 +1,56 @@
 <!DOCTYPE html>
-<html lang="pl" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Szczegóły donosu</title>
-</head>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Szczegóły donosu', 'akta sprawy', ~{::section})}">
 <body>
+<section class="card">
+    <dl class="details-list">
+        <div>
+            <dt>ID</dt>
+            <dd th:text="${report.id}"></dd>
+        </div>
+        <div>
+            <dt>Tytuł</dt>
+            <dd th:text="${report.title}"></dd>
+        </div>
+        <div>
+            <dt>Opis</dt>
+            <dd th:text="${report.description}"></dd>
+        </div>
+        <div>
+            <dt>Oskarżony student</dt>
+            <dd th:text="${report.accusedStudentName}"></dd>
+        </div>
+        <div>
+            <dt>Paragraf</dt>
+            <dd th:text="${report.paragraph != null ? report.paragraph.title : 'Brak'}"></dd>
+        </div>
+        <div>
+            <dt>Autor</dt>
+            <dd th:text="${report.author != null ? report.author.username : 'Brak'}"></dd>
+        </div>
+        <div>
+            <dt>Data zdarzenia</dt>
+            <dd th:text="${report.eventDate}"></dd>
+        </div>
+        <div>
+            <dt>Status</dt>
+            <dd>
+                <span class="badge-status"
+                      th:classappend="${report.status != null ? report.status.name().toLowerCase() : ''}"
+                      th:text="${report.status}"></span>
+            </dd>
+        </div>
+        <div>
+            <dt>Utworzono</dt>
+            <dd th:text="${report.createdAt}"></dd>
+        </div>
+    </dl>
 
-<h1>Szczegóły donosu</h1>
-
-<nav>
-  <a th:href="@{/}">Start</a>|
-    <a th:href="@{/reports}">Powrót do listy donosów</a>|
-</nav>
-
-<hr>
-
-<p>
-  <strong>ID:</strong>
-  <span th:text="${report.id}"></span>
-</p>
-
-<p>
-  <strong>Tytuł:</strong>
-    <span th:text="${report.title}"></span>
-</p>
-
-<p>
-  <strong>Opis:</strong>
-    <span th:text="${report.description}"></span>
-</p>
-
-<p>
-    <strong>Oskarżony student:</strong>
-        <span th:text="${report.accusedStudentName}"></span>
-</p>
-
-<p>
-    <strong>Paragraf:</strong>
-        <span th:text="${report.paragraph != null ? report.paragraph.title : 'Brak'}"></span>
-</p>
-
-<p>
-    <strong>Autor:</strong>
-        <span th:text="${report.author != null ? report.author.username : 'Brak'}"></span>
-</p>
-
-<p>
-    <strong>Data zdarzenia:</strong>
-        <span th:text="${report.eventDate}"></span>
-</p>
-
-<p>
-    <strong>Status:</strong>
-        <span th:text="${report.status}"></span>
-</p>
-
-<p>
-    <strong>Utworzono:</strong>
-        <span th:text="${report.createdAt}"></span>
-</p>
-
-<hr>
-
-<a th:href="@{/reports/{id}/edit(id=${report.id})}">Edytuj donos</a>
-
+    <ul class="action-list">
+        <li><a class="btn" th:href="@{/reports/{id}/edit(id=${report.id})}">Edytuj donos</a></li>
+        <li><a class="btn btn-secondary" th:href="@{/reports}">Powrót do listy donosów</a></li>
+    </ul>
+</section>
 </body>
 </html>

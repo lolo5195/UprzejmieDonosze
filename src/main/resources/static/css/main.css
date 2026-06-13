@@ -3,62 +3,98 @@
     --paper-dark: #e8e2d0;
     --ink: #1f1b16;
     --brown: #5b3a1a;
+    --brown-dark: #3f2914;
     --red: #a4161a;
+    --red-dark: #6d1013;
+    --green: #295135;
     --white: #fffdf7;
+    --shadow: rgba(91, 58, 26, .2);
+}
+
+* {
+    box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    background: var(--paper);
+    background:
+            linear-gradient(rgba(245, 241, 230, .94), rgba(245, 241, 230, .94)),
+            repeating-linear-gradient(0deg, transparent, transparent 1.7rem, rgba(91, 58, 26, .08) 1.8rem);
     color: var(--ink);
     font-family: Georgia, "Times New Roman", serif;
     line-height: 1.5;
 }
 
-header,
-main,
-footer {
-    max-width: 960px;
+.site-header,
+.site-main,
+.site-footer {
+    max-width: 1060px;
     margin: 0 auto;
     padding: 1rem;
 }
 
-header {
+.site-header {
     border-bottom: 3px double var(--brown);
+}
+
+.site-footer {
+    border-top: 1px solid var(--brown);
+    color: var(--brown-dark);
+    margin-top: 2rem;
 }
 
 h1,
 h2,
+h3,
 label,
-.stamp {
+.stamp,
+.btn,
+.badge-status {
     font-family: "Courier New", ui-monospace, monospace;
 }
 
-nav ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .75rem;
-    padding: 0;
-    list-style: none;
+a {
+    color: var(--brown-dark);
+    font-weight: 700;
 }
 
-a {
-    color: var(--brown);
+a:hover {
+    color: var(--red-dark);
 }
 
 a:focus-visible,
 button:focus-visible,
-input:focus-visible {
-    outline: 3px solid var(--red);
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 4px solid var(--red);
     outline-offset: 3px;
+}
+
+.main-nav ul,
+.action-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    align-items: center;
+    padding: 0;
+    list-style: none;
+}
+
+.nav-form {
+    margin: 0;
 }
 
 .card {
     background: var(--white);
     border: 1px solid var(--brown);
-    box-shadow: 0 4px 0 rgba(91, 58, 26, .2);
+    box-shadow: 0 4px 0 var(--shadow);
     margin: 1rem 0;
     padding: 1rem;
+}
+
+.card-muted {
+    background: var(--paper-dark);
 }
 
 .form-field {
@@ -71,24 +107,111 @@ input:focus-visible {
     margin-bottom: .25rem;
 }
 
-.form-field input {
-    box-sizing: border-box;
-    max-width: 28rem;
-    width: 100%;
+.form-field input,
+.form-field select,
+.form-field textarea {
     border: 1px solid var(--brown);
+    color: var(--ink);
+    display: block;
+    font: inherit;
+    max-width: 34rem;
     padding: .55rem;
+    width: 100%;
+}
+
+.form-field textarea {
+    min-height: 8rem;
+}
+
+.checkbox-field {
+    align-items: center;
+    display: flex;
+    gap: .5rem;
+}
+
+.checkbox-field input {
+    width: auto;
 }
 
 .btn,
 button {
     background: var(--brown);
-    border: 0;
+    border: 2px solid var(--brown);
     color: var(--white);
     cursor: pointer;
     display: inline-block;
-    font: 700 1rem "Courier New", ui-monospace, monospace;
+    font-weight: 700;
     padding: .6rem 1rem;
     text-decoration: none;
+}
+
+.btn:hover,
+button:hover {
+    background: var(--brown-dark);
+    color: var(--white);
+}
+
+.btn-danger {
+    background: var(--red);
+    border-color: var(--red);
+}
+
+.btn-secondary,
+.btn-link {
+    background: var(--white);
+    color: var(--brown-dark);
+}
+
+.btn-link {
+    padding: .35rem .65rem;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+.table {
+    background: var(--white);
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table caption {
+    font-weight: 700;
+    margin-bottom: .5rem;
+    text-align: left;
+}
+
+.table th,
+.table td {
+    border: 1px solid var(--brown);
+    padding: .55rem;
+    text-align: left;
+    vertical-align: top;
+}
+
+.table th {
+    background: var(--paper-dark);
+    font-family: "Courier New", ui-monospace, monospace;
+}
+
+.details-list {
+    display: grid;
+    gap: .75rem;
+}
+
+.details-list div {
+    border-bottom: 1px dotted var(--brown);
+    padding-bottom: .5rem;
+}
+
+.details-list dt {
+    font-family: "Courier New", ui-monospace, monospace;
+    font-weight: 700;
+}
+
+.details-list dd {
+    margin: .15rem 0 0;
 }
 
 .alert {
@@ -98,17 +221,44 @@ button {
     padding: .75rem 1rem;
 }
 
-.alert-error,
-.field-error {
-    color: var(--red);
+.alert-error {
+    border-left-color: var(--red);
+    color: var(--red-dark);
     font-weight: 700;
+}
+
+.field-error {
+    color: var(--red-dark);
+    font-weight: 700;
+    margin-top: .25rem;
+}
+
+.badge-status {
+    border: 2px solid var(--brown);
+    display: inline-block;
+    font-weight: 700;
+    padding: .15rem .4rem;
+    text-transform: uppercase;
+}
+
+.badge-status.accepted,
+.badge-status.active {
+    border-color: var(--green);
+    color: var(--green);
+}
+
+.badge-status.rejected,
+.badge-status.inactive {
+    border-color: var(--red);
+    color: var(--red-dark);
 }
 
 .stamp {
     border: .2rem solid var(--red);
-    color: var(--red);
+    color: var(--red-dark);
     display: inline-block;
     font-weight: 700;
+    letter-spacing: .05em;
     padding: .2rem .45rem;
     text-transform: uppercase;
     transform: rotate(-2deg);
@@ -121,8 +271,17 @@ button {
     padding: .5rem;
     position: absolute;
     top: -4rem;
+    z-index: 10;
 }
 
 .skip-link:focus {
     top: 1rem;
+}
+
+@media (max-width: 680px) {
+    .main-nav ul,
+    .action-list {
+        align-items: flex-start;
+        flex-direction: column;
+    }
 }
