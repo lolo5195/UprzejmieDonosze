@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import org.springframework.security.core.Authentication;
+import org.springframework.data.domain.Sort;
+import java.util.List;
 
 @Controller
 @RequestMapping("/reports")
@@ -34,10 +36,46 @@ public class ReportController {
         this.appUserRepository = appUserRepository;
         this.paragraphRepository = paragraphRepository;
     }
-
     @GetMapping
-    public String listReports(Model model) {
-        model.addAttribute("reports", reportRepository.findAll());
+    public String listReports(
+            @RequestParam(required = false) ReportStatus status,
+            @RequestParam(required = false) Long paragraphId,
+            @RequestParam(defaultValue = "eventDate") String sort,
+            @RequestParam(defaultValue = "desc") String dir,
+            Model model
+    ) {
+        String safeSort = switch (sort) {
+            case "title", "status", "eventDate", "createdAt" -> sort;
+            default -> "eventDate";
+        };
+
+        Sort.Direction direction = "asc".equalsIgnoreCase(dir)
+                ? Sort.Direction.ASC
+                : Sort.Direction.DESC;
+
+        Sort sorting = Sort.by(direction, safeSort);
+
+        List<Report> reports;
+
+        if (status != null && paragraphId != null) {
+            reports = reportRepository.findByStatusAndParagraphId(status, paragraphId, sorting);
+        } else if (status != null) {
+            reports = reportRepository.findByStatus(status, sorting);
+        } else if (paragraphId != null) {
+            reports = reportRepository.findByParagraphId(paragraphId, sorting);
+        } else {
+            reports = reportRepository.findAll(sorting);
+        }
+
+        model.addAttribute("reports", reports);
+        model.addAttribute("statuses", ReportStatus.values());
+        model.addAttribute("paragraphs", paragraphRepository.findAll());
+
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("selectedParagraphId", paragraphId);
+        model.addAttribute("selectedSort", safeSort);
+        model.addAttribute("selectedDir", direction.name().toLowerCase());
+
         return "reports/list";
     }
 

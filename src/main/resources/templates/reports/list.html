@@ -3,8 +3,61 @@
       xmlns:th="http://www.thymeleaf.org"
       th:replace="~{fragments/layout :: page('Lista donosów', 'rejestr donosów', ~{::section})}">
 <body>
+<section class="card card-muted">
+    <h2>Filtrowanie i sortowanie</h2>
+
+    <form th:action="@{/reports}" method="get">
+        <div class="form-field">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+                <option value="">Wszystkie statusy</option>
+                <option th:each="status : ${statuses}"
+                        th:value="${status}"
+                        th:text="${status}"
+                        th:selected="${status == selectedStatus}">
+                </option>
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label for="paragraphId">Paragraf</label>
+            <select id="paragraphId" name="paragraphId">
+                <option value="">Wszystkie paragrafy</option>
+                <option th:each="paragraph : ${paragraphs}"
+                        th:value="${paragraph.id}"
+                        th:text="${paragraph.title}"
+                        th:selected="${paragraph.id == selectedParagraphId}">
+                </option>
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label for="sort">Sortuj po</label>
+            <select id="sort" name="sort">
+                <option value="eventDate" th:selected="${selectedSort == 'eventDate'}">Data przewinienia</option>
+                <option value="createdAt" th:selected="${selectedSort == 'createdAt'}">Data utworzenia</option>
+                <option value="title" th:selected="${selectedSort == 'title'}">Tytuł</option>
+                <option value="status" th:selected="${selectedSort == 'status'}">Status</option>
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label for="dir">Kierunek</label>
+            <select id="dir" name="dir">
+                <option value="desc" th:selected="${selectedDir == 'desc'}">Malejąco</option>
+                <option value="asc" th:selected="${selectedDir == 'asc'}">Rosnąco</option>
+            </select>
+        </div>
+
+        <ul class="action-list">
+            <li><button type="submit">Zastosuj</button></li>
+            <li><a class="btn btn-secondary" th:href="@{/reports}">Wyczyść filtry</a></li>
+        </ul>
+    </form>
+</section>
 <section class="card">
     <p><a class="btn" th:href="@{/reports/new}">Dodaj nowy donos</a></p>
+
 
     <div class="table-wrap">
         <table class="table">
