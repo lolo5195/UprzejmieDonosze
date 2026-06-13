@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Błąd systemu', 'awaria kartoteki', ~{::section})}">
+<body>
+<section class="card">
+    <h2>Maszyna do pisania zacięła się</h2>
+    <p>Wystąpił błąd systemu. Spróbuj ponownie albo wróć do strony głównej.</p>
+    <p><a class="btn" th:href="@{/}">Wróć na stronę główną</a></p>
+</section>
+</body>
+</html>

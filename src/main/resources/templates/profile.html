@@ -1,77 +1,65 @@
 <!DOCTYPE html>
-<html lang="pl" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Profil - Uprzejmie Donoszę</title>
-    <link rel="stylesheet" th:href="@{/css/main.css}">
-</head>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Profil użytkownika', 'kartoteka', ~{::section})}">
 <body>
-<a class="skip-link" href="#main">Przejdź do treści</a>
-<header>
-    <p class="stamp">kartoteka</p>
-    <h1>Profil użytkownika</h1>
-    <nav aria-label="Nawigacja główna">
-        <ul>
-            <li><a th:href="@{/}">Strona główna</a></li>
-            <li><a th:href="@{/reports}">Donosy</a></li>
-            <li>
-                <form th:action="@{/logout}" method="post">
-                    <button type="submit">Wyloguj</button>
-                </form>
-            </li>
-        </ul>
-    </nav>
-</header>
+<section class="card">
+    <div class="alert" role="status" th:if="${param.updated}">
+        Dane profilu zostały zapisane.
+    </div>
+    <div class="alert" role="status" th:if="${param.passwordChanged}">
+        Hasło zostało zmienione.
+    </div>
 
-<main id="main">
-    <section class="card">
-        <div class="alert" role="status" th:if="${param.updated}">
-            Dane profilu zostały zapisane.
+    <h2>Dane konta</h2>
+    <dl class="details-list">
+        <div>
+            <dt>Login</dt>
+            <dd th:text="${user.username}"></dd>
         </div>
-        <div class="alert" role="status" th:if="${param.passwordChanged}">
-            Hasło zostało zmienione.
+        <div>
+            <dt>Imię</dt>
+            <dd th:text="${user.firstName}"></dd>
+        </div>
+        <div>
+            <dt>Nazwisko</dt>
+            <dd th:text="${user.lastName}"></dd>
+        </div>
+        <div>
+            <dt>Rola</dt>
+            <dd><span class="badge-status" th:text="${user.role}"></span></dd>
+        </div>
+    </dl>
+    <a class="btn" th:href="@{/profile/edit}">Edytuj dane</a>
+</section>
+
+<section class="card" th:object="${changePasswordForm}">
+    <h2>Zmiana hasła</h2>
+    <div class="alert alert-error" role="alert" th:if="${#fields.hasAnyErrors()}">
+        Formularz zmiany hasła zawiera błędy.
+    </div>
+
+    <form th:action="@{/profile/password}" method="post">
+        <div class="form-field">
+            <label for="currentPassword">Obecne hasło</label>
+            <input id="currentPassword" type="password" th:field="*{currentPassword}" autocomplete="current-password">
+            <div class="field-error" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></div>
         </div>
 
-        <h2>Dane konta</h2>
-        <p><strong>Login:</strong> <span th:text="${user.username}"></span></p>
-        <p><strong>Imię:</strong> <span th:text="${user.firstName}"></span></p>
-        <p><strong>Nazwisko:</strong> <span th:text="${user.lastName}"></span></p>
-        <p><strong>Rola:</strong> <span th:text="${user.role}"></span></p>
-        <a class="btn" th:href="@{/profile/edit}">Edytuj dane</a>
-    </section>
-
-    <section class="card" th:object="${changePasswordForm}">
-        <h2>Zmiana hasła</h2>
-        <div class="alert alert-error" role="alert" th:if="${#fields.hasAnyErrors()}">
-            Formularz zmiany hasła zawiera błędy.
+        <div class="form-field">
+            <label for="newPassword">Nowe hasło</label>
+            <input id="newPassword" type="password" th:field="*{newPassword}" autocomplete="new-password">
+            <div class="field-error" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></div>
         </div>
 
-        <form th:action="@{/profile/password}" method="post">
-            <div class="form-field">
-                <label for="currentPassword">Obecne hasło</label>
-                <input id="currentPassword" type="password" th:field="*{currentPassword}" autocomplete="current-password">
-                <div class="field-error" th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}"></div>
-            </div>
+        <div class="form-field">
+            <label for="confirmNewPassword">Powtórz nowe hasło</label>
+            <input id="confirmNewPassword" type="password" th:field="*{confirmNewPassword}" autocomplete="new-password">
+            <div class="field-error" th:if="${#fields.hasErrors('confirmNewPassword')}" th:errors="*{confirmNewPassword}"></div>
+        </div>
 
-            <div class="form-field">
-                <label for="newPassword">Nowe hasło</label>
-                <input id="newPassword" type="password" th:field="*{newPassword}" autocomplete="new-password">
-                <div class="field-error" th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}"></div>
-            </div>
-
-            <div class="form-field">
-                <label for="confirmNewPassword">Powtórz nowe hasło</label>
-                <input id="confirmNewPassword" type="password" th:field="*{confirmNewPassword}" autocomplete="new-password">
-                <div class="field-error" th:if="${#fields.hasErrors('confirmNewPassword')}" th:errors="*{confirmNewPassword}"></div>
-            </div>
-
-            <button type="submit">Zmień hasło</button>
-        </form>
-    </section>
-</main>
-
-<footer>
-    <p>Uprzejmie Donoszę</p>
-</footer>
+        <button type="submit">Zmień hasło</button>
+    </form>
+</section>
 </body>
 </html>

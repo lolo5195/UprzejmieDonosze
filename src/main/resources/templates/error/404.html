@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Nie znaleziono strony', 'brak akt', ~{::section})}">
+<body>
+<section class="card">
+    <h2>Sprawa nie istnieje</h2>
+    <p>Nie znaleziono wskazanej strony albo dokument został przeniesiony do innej szuflady.</p>
+    <p><a class="btn" th:href="@{/}">Wróć na stronę główną</a></p>
+</section>
+</body>
+</html>

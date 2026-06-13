@@ -1,44 +1,44 @@
 <!DOCTYPE html>
-<html lang="pl" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <title>Formularz paragrafu</title>
-</head>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page(${paragraphForm.id == null ? 'Dodaj paragraf' : 'Edytuj paragraf'}, 'akta paragrafu', ~{::section})}">
 <body>
+<section class="card" th:object="${paragraphForm}">
+    <div class="alert alert-error" role="alert" th:if="${#fields.hasAnyErrors()}">
+        Formularz zawiera błędy. Popraw pola oznaczone komunikatem.
+    </div>
 
-<h1 th:text="${paragraphForm.id == null ? 'Dodaj paragraf' : 'Edytuj paragraf'}"></h1>
+    <form th:action="@{/paragraphs/save}" method="post">
+        <input type="hidden" th:field="*{id}">
 
-<form th:action="@{/paragraphs/save}" th:object="${paragraphForm}" method="post">
+        <div class="form-field">
+            <label for="title">Nazwa paragrafu</label>
+            <input id="title" type="text" th:field="*{title}">
+            <div class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+        </div>
 
-  <input type="hidden" th:field="*{id}">
+        <div class="form-field">
+            <label for="description">Opis</label>
+            <textarea id="description" th:field="*{description}"></textarea>
+            <div class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+        </div>
 
-  <div>
-    <label for="title">Nazwa paragrafu:</label>
-    <input id="title" type="text" th:field="*{title}">
-    <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
-  </div>
+        <div class="form-field">
+            <label for="severity">Waga przewinienia 1-10</label>
+            <input id="severity" type="number" min="1" max="10" th:field="*{severity}">
+            <div class="field-error" th:if="${#fields.hasErrors('severity')}" th:errors="*{severity}"></div>
+        </div>
 
-  <div>
-    <label for="description">Opis:</label>
-    <textarea id="description" th:field="*{description}"></textarea>
-    <div th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
-  </div>
+        <div class="form-field checkbox-field">
+            <input id="active" type="checkbox" th:field="*{active}">
+            <label for="active">Aktywny</label>
+        </div>
 
-  <div>
-    <label for="severity">Waga przewinienia 1-10:</label>
-    <input id="severity" type="number" th:field="*{severity}">
-    <div th:if="${#fields.hasErrors('severity')}" th:errors="*{severity}"></div>
-  </div>
-
-  <div>
-    <label for="active">Aktywny:</label>
-    <input id="active" type="checkbox" th:field="*{active}">
-  </div>
-
-  <button type="submit">Zapisz</button>
-</form>
-
-<a th:href="@{/paragraphs}">Powrót do listy</a>
-
+        <ul class="action-list">
+            <li><button type="submit">Zapisz</button></li>
+            <li><a class="btn btn-secondary" th:href="@{/paragraphs}">Powrót do listy</a></li>
+        </ul>
+    </form>
+</section>
 </body>
 </html>

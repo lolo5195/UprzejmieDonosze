@@ -54,7 +54,7 @@ public class ParagraphController {
         return "paragraphs/form";
     }
 
-    @GetMapping("/{id}/delete")
+    @PostMapping("/{id}/delete")
     public String deleteParagraph(@PathVariable Long id) {
         paragraphRepository.deleteById(id);
         return "redirect:/paragraphs";

@@ -1,5 +1,9 @@
 HELP.md
 *.md
+!docs/
+!docs/WCAG_CHECKLIST.md
+!.github/
+!.github/pull_request_template.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
