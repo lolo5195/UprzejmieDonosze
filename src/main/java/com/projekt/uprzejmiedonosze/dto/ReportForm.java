@@ -38,7 +38,7 @@ public class ReportForm {
 
     private ReportStatus status = ReportStatus.NEW;
 
-    @NotNull(message = "Autor jest wymagany")
+
     private Long authorId;
 
     @NotNull(message = "Paragraf jest wymagany")

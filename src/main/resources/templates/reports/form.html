@@ -47,17 +47,7 @@
             <div class="field-error" th:if="${#fields.hasErrors('paragraphId')}" th:errors="*{paragraphId}"></div>
         </div>
 
-        <div class="form-field">
-            <label for="authorId">Autor</label>
-            <select id="authorId" th:field="*{authorId}">
-                <option value="">-- wybierz autora --</option>
-                <option th:each="author : ${authors}"
-                        th:value="${author.id}"
-                        th:text="${author.username}">
-                </option>
-            </select>
-            <div class="field-error" th:if="${#fields.hasErrors('authorId')}" th:errors="*{authorId}"></div>
-        </div>
+
 
         <div class="form-field">
             <label for="status">Status</label>

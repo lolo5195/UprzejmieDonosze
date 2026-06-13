@@ -15,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import org.springframework.security.core.Authentication;
 
 @Controller
 @RequestMapping("/reports")
@@ -51,14 +52,15 @@ public class ReportController {
     public String saveReport(
             @Valid @ModelAttribute("reportForm") ReportForm reportForm,
             BindingResult bindingResult,
-            Model model
+            Model model,
+            Authentication authentication
     ) {
         if (bindingResult.hasErrors()) {
             addFormLists(model);
             return "reports/form";
         }
 
-        Report report = toEntity(reportForm);
+        Report report = toEntity(reportForm, authentication.getName());
         reportRepository.save(report);
         return "redirect:/reports";
     }
@@ -114,7 +116,7 @@ public class ReportController {
         return form;
     }
 
-    private Report toEntity(ReportForm form) {
+    private Report toEntity(ReportForm form, String username) {
         Report report;
 
         if (form.getId() != null) {
@@ -134,9 +136,11 @@ public class ReportController {
             report.setCreatedAt(LocalDate.now());
         }
 
-        AppUser author = appUserRepository.findById(form.getAuthorId())
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o id: " + form.getAuthorId()));
-        report.setAuthor(author);
+        if (report.getAuthor() == null) {
+            AppUser author = appUserRepository.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono zalogowanego użytkownika: " + username));
+            report.setAuthor(author);
+        }
 
         Paragraph paragraph = paragraphRepository.findById(form.getParagraphId())
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono paragrafu o id: " + form.getParagraphId()));
