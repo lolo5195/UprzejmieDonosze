@@ -19,6 +19,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.data.domain.Sort;
 import java.util.List;
 import org.springframework.security.core.Authentication;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.bind.annotation.CookieValue;
 
 @Controller
 @RequestMapping("/reports")
@@ -39,17 +42,50 @@ public class ReportController {
     }
     @GetMapping
     public String listReports(
-            @RequestParam(required = false) ReportStatus status,
-            @RequestParam(required = false) Long paragraphId,
-            @RequestParam(defaultValue = "eventDate") String sort,
-            @RequestParam(defaultValue = "desc") String dir,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String paragraphId,
+            @RequestParam(required = false) String sort,
+            @RequestParam(required = false) String dir,
+            @RequestParam(required = false) String clearFilters,
+
+            @CookieValue(value = "reportStatus", required = false) String cookieStatus,
+            @CookieValue(value = "reportParagraphId", required = false) String cookieParagraphId,
+            @CookieValue(value = "reportSort", required = false) String cookieSort,
+            @CookieValue(value = "reportDir", required = false) String cookieDir,
+
+            HttpServletResponse response,
             Model model
     ) {
-        String safeSort = switch (sort) {
-            case "title", "status", "eventDate", "createdAt" -> sort;
-            default -> "eventDate";
-        };
+        if (clearFilters != null) {
+            deleteCookie(response, "reportStatus");
+            deleteCookie(response, "reportParagraphId");
+            deleteCookie(response, "reportSort");
+            deleteCookie(response, "reportDir");
 
+            return "redirect:/reports";
+        }
+
+        boolean requestHasFilterParams = status != null
+                || paragraphId != null
+                || sort != null
+                || dir != null;
+
+        if (!requestHasFilterParams) {
+            status = cookieStatus;
+            paragraphId = cookieParagraphId;
+            sort = cookieSort;
+            dir = cookieDir;
+        } else {
+            addCookie(response, "reportStatus", status);
+            addCookie(response, "reportParagraphId", paragraphId);
+            addCookie(response, "reportSort", sort);
+            addCookie(response, "reportDir", dir);
+        }
+
+        ReportStatus selectedStatus = parseReportStatus(status);
+        Long selectedParagraphId = parseLong(paragraphId);
+
+        String safeSort = sanitizeSort(sort);
         Sort.Direction direction = "asc".equalsIgnoreCase(dir)
                 ? Sort.Direction.ASC
                 : Sort.Direction.DESC;
@@ -58,12 +94,12 @@ public class ReportController {
 
         List<Report> reports;
 
-        if (status != null && paragraphId != null) {
-            reports = reportRepository.findByStatusAndParagraphId(status, paragraphId, sorting);
-        } else if (status != null) {
-            reports = reportRepository.findByStatus(status, sorting);
-        } else if (paragraphId != null) {
-            reports = reportRepository.findByParagraphId(paragraphId, sorting);
+        if (selectedStatus != null && selectedParagraphId != null) {
+            reports = reportRepository.findByStatusAndParagraphId(selectedStatus, selectedParagraphId, sorting);
+        } else if (selectedStatus != null) {
+            reports = reportRepository.findByStatus(selectedStatus, sorting);
+        } else if (selectedParagraphId != null) {
+            reports = reportRepository.findByParagraphId(selectedParagraphId, sorting);
         } else {
             reports = reportRepository.findAll(sorting);
         }
@@ -72,8 +108,8 @@ public class ReportController {
         model.addAttribute("statuses", ReportStatus.values());
         model.addAttribute("paragraphs", paragraphRepository.findAll());
 
-        model.addAttribute("selectedStatus", status);
-        model.addAttribute("selectedParagraphId", paragraphId);
+        model.addAttribute("selectedStatus", selectedStatus);
+        model.addAttribute("selectedParagraphId", selectedParagraphId);
         model.addAttribute("selectedSort", safeSort);
         model.addAttribute("selectedDir", direction.name().toLowerCase());
 
@@ -152,6 +188,54 @@ public class ReportController {
     private void addFormLists(Model model) {
         model.addAttribute("paragraphs", paragraphRepository.findAll());
         model.addAttribute("statuses", ReportStatus.values());
+    }
+    private void addCookie(HttpServletResponse response, String name, String value) {
+        Cookie cookie = new Cookie(name, value == null ? "" : value);
+        cookie.setPath("/reports");
+        cookie.setMaxAge(30 * 24 * 60 * 60); // 30 dni
+        response.addCookie(cookie);
+    }
+
+    private void deleteCookie(HttpServletResponse response, String name) {
+        Cookie cookie = new Cookie(name, "");
+        cookie.setPath("/reports");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+    }
+
+    private Long parseLong(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException exception) {
+            return null;
+        }
+    }
+
+    private ReportStatus parseReportStatus(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        try {
+            return ReportStatus.valueOf(value);
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
+    }
+
+    private String sanitizeSort(String sort) {
+        if (sort == null || sort.isBlank()) {
+            return "eventDate";
+        }
+
+        return switch (sort) {
+            case "title", "status", "eventDate", "createdAt" -> sort;
+            default -> "eventDate";
+        };
     }
 
     private ReportForm toForm(Report report) {
