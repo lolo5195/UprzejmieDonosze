@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import org.springframework.security.core.Authentication;
 import org.springframework.data.domain.Sort;
 import java.util.List;
+import org.springframework.security.core.Authentication;
 
 @Controller
 @RequestMapping("/reports")
@@ -104,9 +105,13 @@ public class ReportController {
     }
 
     @GetMapping("/{id}/edit")
-    public String showEditForm(@PathVariable Long id, Model model) {
+    public String showEditForm(@PathVariable Long id, Model model, Authentication authentication) {
         Report report = reportRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono donosu o id: " + id));
+
+        if (!canModifyReport(report, authentication)) {
+            return "redirect:/access-denied";
+        }
 
         model.addAttribute("reportForm", toForm(report));
         addFormLists(model);
@@ -114,8 +119,15 @@ public class ReportController {
     }
 
     @PostMapping("/{id}/delete")
-    public String deleteReport(@PathVariable Long id) {
-        reportRepository.deleteById(id);
+    public String deleteReport(@PathVariable Long id, Authentication authentication) {
+        Report report = reportRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono donosu o id: " + id));
+
+        if (!canModifyReport(report, authentication)) {
+            return "redirect:/access-denied";
+        }
+
+        reportRepository.delete(report);
         return "redirect:/reports";
     }
 
@@ -127,9 +139,17 @@ public class ReportController {
         model.addAttribute("report", report);
         return "reports/detail";
     }
+    private boolean canModifyReport(Report report, Authentication authentication) {
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+        boolean isAuthor = report.getAuthor() != null
+                && report.getAuthor().getUsername().equals(authentication.getName());
+
+        return isAdmin || isAuthor;
+    }
 
     private void addFormLists(Model model) {
-        model.addAttribute("authors", appUserRepository.findAll());
         model.addAttribute("paragraphs", paragraphRepository.findAll());
         model.addAttribute("statuses", ReportStatus.values());
     }

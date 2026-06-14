@@ -91,9 +91,13 @@
                 <td>
                     <ul class="action-list">
                         <li><a th:href="@{/reports/{id}(id=${report.id})}">Szczegóły</a></li>
-                        <li><a th:href="@{/reports/{id}/edit(id=${report.id})}">Edytuj</a></li>
+                        <li><a th:if="${#authorization.expression('hasRole(''ADMIN'')') or report.author.username == #authentication.name}"
+                               th:href="@{/reports/{id}/edit(id=${report.id})}">
+                            Edytuj
+                        </a></li>
                         <li>
                             <form class="delete-form"
+                                  th:if="${#authorization.expression('hasRole(''ADMIN'')') or report.author.username == #authentication.name}"
                                   th:action="@{/reports/{id}/delete(id=${report.id})}"
                                   method="post"
                                   onsubmit="return confirm('Na pewno usunąć donos?')">
