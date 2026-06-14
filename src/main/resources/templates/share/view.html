@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Udostępniony donos', 'publiczny wgląd', ~{::section})}">
+<body>
+<section class="card">
+    <h2 th:text="${report.title}">Tytuł donosu</h2>
+
+    <p>
+        Ten widok jest publiczny i dostępny tylko do odczytu przez unikalny link.
+    </p>
+
+    <dl class="details-list">
+        <div>
+            <dt>Zgłaszany student</dt>
+            <dd th:text="${report.accusedStudentName}">Jan Kowalski</dd>
+        </div>
+
+        <div>
+            <dt>Paragraf</dt>
+            <dd th:text="${report.paragraph != null ? report.paragraph.title : 'Brak'}">Paragraf</dd>
+        </div>
+
+        <div>
+            <dt>Data zdarzenia</dt>
+            <dd th:text="${report.eventDate}">2026-01-01</dd>
+        </div>
+
+        <div>
+            <dt>Status</dt>
+            <dd>
+                <span class="badge-status"
+                      th:text="${report.status}"
+                      th:classappend="${report.status != null ? ' ' + report.status.name().toLowerCase() : ''}">
+                    NEW
+                </span>
+            </dd>
+        </div>
+
+        <div>
+            <dt>Opis</dt>
+            <dd th:text="${report.description}">Opis donosu</dd>
+        </div>
+    </dl>
+
+    <ul class="action-list">
+        <li>
+            <a class="btn btn-secondary" th:href="@{/}">
+                Strona główna
+            </a>
+        </li>
+    </ul>
+</section>
+</body>
+</html>

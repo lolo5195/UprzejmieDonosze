@@ -48,8 +48,27 @@
     </dl>
 
     <ul class="action-list">
-        <li><a class="btn" th:href="@{/reports/{id}/edit(id=${report.id})}">Edytuj donos</a></li>
-        <li><a class="btn btn-secondary" th:href="@{/reports}">Powrót do listy donosów</a></li>
+        <li>
+            <a class="btn"
+               th:if="${#authorization.expression('hasRole(''ADMIN'')') or report.author.username == #authentication.name}"
+               th:href="@{/reports/{id}/edit(id=${report.id})}">
+                Edytuj donos
+            </a>
+        </li>
+
+        <li>
+            <a class="btn btn-secondary"
+               th:href="@{/share/{token}(token=${report.shareToken})}"
+               target="_blank">
+                Otwórz publiczny link
+            </a>
+        </li>
+
+        <li>
+            <a class="btn btn-secondary" th:href="@{/reports}">
+                Powrót do listy donosów
+            </a>
+        </li>
     </ul>
 </section>
 </body>

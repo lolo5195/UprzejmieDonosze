@@ -13,7 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.UUID;
 import java.time.LocalDate;
 import org.springframework.security.core.Authentication;
 import org.springframework.data.domain.Sort;
@@ -167,10 +167,11 @@ public class ReportController {
         return "redirect:/reports";
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public String showReportDetails(@PathVariable Long id, Model model) {
         Report report = reportRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono donosu o id: " + id));
+
 
         model.addAttribute("report", report);
         return "reports/detail";
@@ -287,7 +288,9 @@ public class ReportController {
         Paragraph paragraph = paragraphRepository.findById(form.getParagraphId())
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono paragrafu o id: " + form.getParagraphId()));
         report.setParagraph(paragraph);
-
+        if (report.getShareToken() == null || report.getShareToken().isBlank()) {
+            report.setShareToken(UUID.randomUUID().toString());
+        }
         return report;
     }
 }
