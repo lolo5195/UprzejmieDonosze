@@ -1,33 +1,34 @@
 package com.projekt.uprzejmiedonosze.controller;
 
 import com.projekt.uprzejmiedonosze.dto.ParagraphForm;
-import com.projekt.uprzejmiedonosze.model.Paragraph;
-import com.projekt.uprzejmiedonosze.repository.ParagraphRepository;
+import com.projekt.uprzejmiedonosze.service.ParagraphService;
 import jakarta.validation.Valid;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/paragraphs")
 public class ParagraphController {
 
-    private final ParagraphRepository paragraphRepository;
+    private final ParagraphService paragraphService;
 
-    public ParagraphController(ParagraphRepository paragraphRepository) {
-        this.paragraphRepository = paragraphRepository;
+    public ParagraphController(ParagraphService paragraphService) {
+        this.paragraphService = paragraphService;
     }
 
     @GetMapping
     public String listParagraphs(Model model) {
-        model.addAttribute("paragraphs", paragraphRepository.findAll());
+        model.addAttribute("paragraphs", paragraphService.findAll());
         return "paragraphs/list";
     }
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        model.addAttribute("paragraphForm", new ParagraphForm());
+        model.addAttribute("paragraphForm", paragraphService.createForm());
         return "paragraphs/form";
     }
 
@@ -40,51 +41,27 @@ public class ParagraphController {
             return "paragraphs/form";
         }
 
-        Paragraph paragraph = toEntity(paragraphForm);
-        paragraphRepository.save(paragraph);
+        paragraphService.save(paragraphForm);
         return "redirect:/paragraphs";
     }
 
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable Long id, Model model) {
-        Paragraph paragraph = paragraphRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono paragrafu o id: " + id));
-
-        model.addAttribute("paragraphForm", toForm(paragraph));
+        model.addAttribute("paragraphForm", paragraphService.findFormById(id));
         return "paragraphs/form";
     }
 
     @PostMapping("/{id}/delete")
-    public String deleteParagraph(@PathVariable Long id) {
-        paragraphRepository.deleteById(id);
-        return "redirect:/paragraphs";
-    }
-
-    private ParagraphForm toForm(Paragraph paragraph) {
-        ParagraphForm form = new ParagraphForm();
-        form.setId(paragraph.getId());
-        form.setTitle(paragraph.getTitle());
-        form.setDescription(paragraph.getDescription());
-        form.setSeverity(paragraph.getSeverity());
-        form.setActive(paragraph.isActive());
-        return form;
-    }
-
-    private Paragraph toEntity(ParagraphForm form) {
-        Paragraph paragraph;
-
-        if (form.getId() != null) {
-            paragraph = paragraphRepository.findById(form.getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono paragrafu o id: " + form.getId()));
-        } else {
-            paragraph = new Paragraph();
+    public String deleteParagraph(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            paragraphService.delete(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Paragraf został usunięty.");
+        } catch (DataIntegrityViolationException exception) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Nie można usunąć paragrafu powiązanego z istniejącymi donosami. Oznacz go jako nieaktywny."
+            );
         }
-
-        paragraph.setTitle(form.getTitle());
-        paragraph.setDescription(form.getDescription());
-        paragraph.setSeverity(form.getSeverity());
-        paragraph.setActive(form.isActive());
-
-        return paragraph;
+        return "redirect:/paragraphs";
     }
 }

@@ -200,6 +200,11 @@ button:hover {
     font-family: "Courier New", ui-monospace, monospace;
 }
 
+.row-muted {
+    background: var(--paper-dark);
+    color: var(--brown-dark);
+}
+
 .details-list {
     display: grid;
     gap: .75rem;

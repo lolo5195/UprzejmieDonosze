@@ -4,6 +4,9 @@
       th:replace="~{fragments/layout :: page('Lista paragrafów', 'rejestr paragrafów', ~{::section})}">
 <body>
 <section class="card">
+    <div class="alert" role="status" th:if="${successMessage}" th:text="${successMessage}"></div>
+    <div class="alert alert-error" role="alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
     <p><a class="btn" th:href="@{/paragraphs/new}">Dodaj nowy paragraf</a></p>
 
     <div class="table-wrap">
@@ -21,7 +24,8 @@
             </thead>
 
             <tbody>
-            <tr th:each="paragraph : ${paragraphs}">
+            <tr th:each="paragraph : ${paragraphs}"
+                th:classappend="${paragraph.active ? '' : 'row-muted'}">
                 <td th:text="${paragraph.id}"></td>
                 <td th:text="${paragraph.title}"></td>
                 <td th:text="${paragraph.description}"></td>
