@@ -13,12 +13,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import java.util.UUID;
 import java.time.LocalDate;
 import org.springframework.security.core.Authentication;
 import org.springframework.data.domain.Sort;
 import java.util.List;
-import org.springframework.security.core.Authentication;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -288,9 +286,7 @@ public class ReportController {
         Paragraph paragraph = paragraphRepository.findById(form.getParagraphId())
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono paragrafu o id: " + form.getParagraphId()));
         report.setParagraph(paragraph);
-        if (report.getShareToken() == null || report.getShareToken().isBlank()) {
-            report.setShareToken(UUID.randomUUID().toString());
-        }
+
         return report;
     }
 }
