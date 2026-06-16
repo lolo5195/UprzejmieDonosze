@@ -4,6 +4,7 @@ import com.projekt.uprzejmiedonosze.dto.ChangePasswordForm;
 import com.projekt.uprzejmiedonosze.dto.ProfileForm;
 import com.projekt.uprzejmiedonosze.model.AppUser;
 import com.projekt.uprzejmiedonosze.service.ProfileService;
+import com.projekt.uprzejmiedonosze.service.StatisticsService;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -19,9 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ProfileController {
 
     private final ProfileService profileService;
+    private final StatisticsService statisticsService;
 
-    public ProfileController(ProfileService profileService) {
+    public ProfileController(ProfileService profileService, StatisticsService statisticsService) {
         this.profileService = profileService;
+        this.statisticsService = statisticsService;
     }
 
     @GetMapping
@@ -75,7 +78,9 @@ public class ProfileController {
     }
 
     private void addProfileModel(String username, Model model) {
-        model.addAttribute("user", profileService.getByUsername(username));
+        AppUser user = profileService.getByUsername(username);
+        model.addAttribute("user", user);
+        model.addAttribute("userStats", statisticsService.getStatsForUser(user.getId()));
     }
 
     private ProfileForm toProfileForm(AppUser user) {

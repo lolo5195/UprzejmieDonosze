@@ -1,8 +1,10 @@
 package com.projekt.uprzejmiedonosze;
 
+import com.projekt.uprzejmiedonosze.dto.UserStats;
 import com.projekt.uprzejmiedonosze.model.AppUser;
 import com.projekt.uprzejmiedonosze.model.Role;
 import com.projekt.uprzejmiedonosze.repository.AppUserRepository;
+import com.projekt.uprzejmiedonosze.service.StatisticsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +14,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrlPattern;
@@ -39,6 +45,9 @@ class SecurityEpicIntegrationTests {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @MockitoBean
+    private StatisticsService statisticsService;
 
     @BeforeEach
     void setUp() {
@@ -124,12 +133,17 @@ class SecurityEpicIntegrationTests {
     @Test
     @WithMockUser(username = "profil")
     void profileShowsAuthenticatedUserData() throws Exception {
-        saveUser("profil", "tajne123", Role.USER);
+        AppUser user = saveUser("profil", "tajne123", Role.USER);
+        when(statisticsService.getStatsForUser(user.getId())).thenReturn(new UserStats(4, 2));
 
         mockMvc.perform(get("/profile"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("profile"))
-                .andExpect(model().attributeExists("user", "changePasswordForm"));
+                .andExpect(model().attributeExists("user", "userStats", "changePasswordForm"))
+                .andExpect(content().string(containsString("Złożone donosy")))
+                .andExpect(content().string(containsString("Otrzymane donosy")))
+                .andExpect(content().string(containsString("<dd>4</dd>")))
+                .andExpect(content().string(containsString("<dd>2</dd>")));
     }
 
     @Test
@@ -153,7 +167,8 @@ class SecurityEpicIntegrationTests {
     @Test
     @WithMockUser(username = "profil")
     void profilePasswordChangeRejectsInvalidOldPassword() throws Exception {
-        saveUser("profil", "stare123", Role.USER);
+        AppUser user = saveUser("profil", "stare123", Role.USER);
+        when(statisticsService.getStatsForUser(user.getId())).thenReturn(new UserStats(0, 0));
 
         mockMvc.perform(post("/profile/password")
                         .with(csrf())
