@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Klient REST', 'podgląd API', ~{::section})}">
+<body>
+
+<section class="card">
+  <h2>Donosy pobrane przez REST API</h2>
+
+
+  <ul class="action-list">
+    <li>
+      <button type="button" id="reloadReports">
+        Odśwież dane
+      </button>
+    </li>
+
+    <li>
+      <a class="btn btn-secondary" th:href="@{/reports}">
+        Zwykła lista donosów
+      </a>
+    </li>
+  </ul>
+
+  <p id="apiStatus"
+     class="alert"
+     role="status"
+     aria-live="polite">
+    Oczekiwanie na pobranie danych...
+  </p>
+
+  <div class="table-wrap">
+    <table class="table">
+      <caption>Lista donosów zwrócona przez REST API</caption>
+
+      <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Tytuł</th>
+        <th scope="col">Zgłaszany student</th>
+        <th scope="col">Data zdarzenia</th>
+        <th scope="col">Status</th>
+        <th scope="col">Paragraf</th>
+      </tr>
+      </thead>
+
+      <tbody id="reportRows"></tbody>
+    </table>
+  </div>
+
+  <!-- SKRYPT MUSI BYĆ W ŚRODKU SECTION -->
+  <script>
+    const reportRows = document.getElementById("reportRows");
+    const apiStatus = document.getElementById("apiStatus");
+    const reloadButton = document.getElementById("reloadReports");
+
+    function addCell(row, value) {
+      const cell = document.createElement("td");
+      cell.textContent = value ?? "-";
+      row.appendChild(cell);
+    }
+
+    async function loadReports() {
+      apiStatus.textContent = "Pobieranie danych z /api/reports...";
+      apiStatus.classList.remove("alert-error");
+      reloadButton.disabled = true;
+
+      try {
+        const response = await fetch("/api/reports", {
+          method: "GET",
+          headers: {
+            "Accept": "application/json"
+          },
+          credentials: "same-origin"
+        });
+
+        if (!response.ok) {
+          throw new Error("API zwróciło status HTTP " + response.status);
+        }
+
+        const reports = await response.json();
+
+        reportRows.replaceChildren();
+
+        if (reports.length === 0) {
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+
+          cell.colSpan = 6;
+          cell.textContent = "Brak donosów w bazie danych.";
+
+          row.appendChild(cell);
+          reportRows.appendChild(row);
+        } else {
+          reports.forEach(report => {
+            const row = document.createElement("tr");
+
+            addCell(row, report.id);
+            addCell(row, report.title);
+            addCell(row, report.accusedStudentName);
+            addCell(row, report.eventDate);
+            addCell(row, report.status);
+            addCell(row, report.paragraphTitle);
+
+            reportRows.appendChild(row);
+          });
+        }
+
+        apiStatus.textContent =
+                "Pobrano rekordów: " + reports.length;
+
+      } catch (error) {
+        reportRows.replaceChildren();
+
+        apiStatus.textContent =
+                "Nie udało się pobrać danych: " + error.message;
+
+        apiStatus.classList.add("alert-error");
+      } finally {
+        reloadButton.disabled = false;
+      }
+    }
+
+    reloadButton.addEventListener("click", loadReports);
+
+    loadReports();
+  </script>
+</section>
+
+</body>
+</html>
