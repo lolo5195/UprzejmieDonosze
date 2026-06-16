@@ -26,6 +26,7 @@
                 <a th:href="@{/rest-demo}">Klient REST</a>
             </li>
             <li sec:authorize="isAuthenticated()"><a th:href="@{/profile}">Profil</a></li>
+            <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin}">Panel admina</a></li>
             <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/users}">Użytkownicy</a></li>
             <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/paragraphs}">Paragrafy</a></li>
             <li sec:authorize="isAuthenticated()">

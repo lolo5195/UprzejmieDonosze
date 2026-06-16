@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pl"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: page('Panel admina', 'dyżurka administratora', ~{::section})}">
+<body>
+<section class="card">
+    <h2>Podsumowanie systemu</h2>
+
+    <div class="table-wrap">
+        <table class="table">
+            <caption>Liczniki administracyjne</caption>
+            <tbody>
+            <tr>
+                <th scope="row">Użytkownicy</th>
+                <td th:text="${totalUsers}">0</td>
+            </tr>
+            <tr>
+                <th scope="row">Donosy</th>
+                <td th:text="${totalReports}">0</td>
+            </tr>
+            <tr>
+                <th scope="row">Paragrafy</th>
+                <td th:text="${totalParagraphs}">0</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="card">
+    <h2>Donosy według statusu</h2>
+
+    <div class="table-wrap">
+        <table class="table">
+            <caption>Liczba donosów w każdym statusie</caption>
+            <thead>
+            <tr>
+                <th scope="col">Status</th>
+                <th scope="col">Liczba</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="status : ${statuses}">
+                <td>
+                    <span class="badge-status"
+                          th:classappend="${status.name().toLowerCase()}"
+                          th:text="${status}">NEW</span>
+                </td>
+                <td th:text="${reportStatusCounts[status.name()]}">0</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="card card-muted">
+    <h2>Skróty administracyjne</h2>
+    <ul class="action-list">
+        <li><a class="btn" th:href="@{/users}">Użytkownicy</a></li>
+        <li><a class="btn" th:href="@{/paragraphs}">Paragrafy</a></li>
+        <li><a class="btn" th:href="@{/reports}">Donosy</a></li>
+    </ul>
+</section>
+</body>
+</html>
