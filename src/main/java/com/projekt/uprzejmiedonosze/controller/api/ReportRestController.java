@@ -15,6 +15,7 @@ import jakarta.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -56,9 +57,12 @@ public class ReportRestController {
     }
 
     @PostMapping
-    public ResponseEntity<ReportResponse> createReport(@Valid @RequestBody ReportRequest request) {
+    public ResponseEntity<ReportResponse> createReport(
+            @Valid @RequestBody ReportRequest request,
+            Authentication authentication
+    ) {
         Report report = new Report();
-        fillReportFromRequest(report, request);
+        fillReportFromRequest(report, request, authentication);
 
         if (report.getCreatedAt() == null) {
             report.setCreatedAt(LocalDate.now());
@@ -76,12 +80,13 @@ public class ReportRestController {
     @PutMapping("/{id}")
     public ReportResponse updateReport(
             @PathVariable Long id,
-            @Valid @RequestBody ReportRequest request
+            @Valid @RequestBody ReportRequest request,
+            Authentication authentication
     ) {
         Report report = reportRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono donosu"));
 
-        fillReportFromRequest(report, request);
+        fillReportFromRequest(report, request, authentication);
 
         Report savedReport = reportRepository.save(report);
 
@@ -99,16 +104,27 @@ public class ReportRestController {
         return ResponseEntity.noContent().build();
     }
 
-    private void fillReportFromRequest(Report report, ReportRequest request) {
-        AppUser author = appUserRepository.findById(request.authorId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono autora"));
+    private void fillReportFromRequest(Report report, ReportRequest request, Authentication authentication) {
+        AppUser author = appUserRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono zalogowanego użytkownika"));
+
+        if (!author.getId().equals(request.authorId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Nie możesz utworzyć donosu jako inny użytkownik");
+        }
+
+        if (author.getId().equals(request.accusedUserId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie możesz zgłosić siebie");
+        }
+
+        AppUser accusedUser = appUserRepository.findById(request.accusedUserId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono zgłaszanego użytkownika"));
 
         Paragraph paragraph = paragraphRepository.findById(request.paragraphId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono paragrafu"));
 
         report.setTitle(request.title());
         report.setDescription(request.description());
-        report.setAccusedStudentName(request.accusedStudentName());
+        report.setAccusedUser(accusedUser);
         report.setEventDate(request.eventDate());
         report.setAuthor(author);
         report.setParagraph(paragraph);
@@ -121,11 +137,15 @@ public class ReportRestController {
     }
 
     private ReportResponse toResponse(Report report) {
+        AppUser accusedUser = report.getAccusedUser();
+
         return new ReportResponse(
                 report.getId(),
                 report.getTitle(),
                 report.getDescription(),
-                report.getAccusedStudentName(),
+                accusedUser != null ? accusedUser.getId() : null,
+                accusedUser != null ? accusedUser.getUsername() : null,
+                formatFullName(accusedUser),
                 report.getEventDate(),
                 report.getCreatedAt(),
                 report.getStatus(),
@@ -134,6 +154,18 @@ public class ReportRestController {
                 report.getParagraph() != null ? report.getParagraph().getId() : null,
                 report.getParagraph() != null ? report.getParagraph().getTitle() : null
         );
+    }
+
+    private String formatFullName(AppUser user) {
+        if (user == null) {
+            return null;
+        }
+
+        String firstName = user.getFirstName() != null ? user.getFirstName() : "";
+        String lastName = user.getLastName() != null ? user.getLastName() : "";
+        String fullName = (firstName + " " + lastName).trim();
+
+        return fullName.isBlank() ? null : fullName;
     }
 
     public record ReportRequest(
@@ -145,9 +177,8 @@ public class ReportRestController {
             @Size(min = 10, max = 1000, message = "Opis musi mieć od 10 do 1000 znaków")
             String description,
 
-            @NotBlank(message = "Imię i nazwisko oskarżonego studenta jest wymagane")
-            @Size(min = 3, max = 80, message = "Dane studenta muszą mieć od 3 do 80 znaków")
-            String accusedStudentName,
+            @NotNull(message = "Zgłaszany użytkownik jest wymagany")
+            Long accusedUserId,
 
             @PastOrPresent(message = "Data zdarzenia nie może być z przyszłości")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -167,7 +198,9 @@ public class ReportRestController {
             Long id,
             String title,
             String description,
-            String accusedStudentName,
+            Long accusedUserId,
+            String accusedUsername,
+            String accusedFullName,
             LocalDate eventDate,
             LocalDate createdAt,
             ReportStatus status,

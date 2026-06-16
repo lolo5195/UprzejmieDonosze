@@ -20,7 +20,7 @@ Table reports {
   id number [pk]
   title varchar(80) [not null]
   description varchar(1000) [not null]
-  accused_student_name varchar(80) [not null]
+  accused_user_id number [not null]
   event_date date
   created_at date
   status varchar(20) [not null, note: 'NEW, ACCEPTED, REJECTED']
@@ -30,4 +30,5 @@ Table reports {
 }
 
 Ref: reports.author_id > app_users.id
+Ref: reports.accused_user_id > app_users.id
 Ref: reports.paragraph_id > paragraphs.id

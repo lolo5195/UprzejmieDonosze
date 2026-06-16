@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import org.springframework.security.core.Authentication;
 import org.springframework.data.domain.Sort;
 import java.util.List;
+import java.util.UUID;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -115,9 +116,9 @@ public class ReportController {
     }
 
     @GetMapping("/new")
-    public String showCreateForm(Model model) {
+    public String showCreateForm(Model model, Authentication authentication) {
         model.addAttribute("reportForm", new ReportForm());
-        addFormLists(model);
+        addFormLists(model, authentication.getName());
         return "reports/form";
     }
 
@@ -128,12 +129,24 @@ public class ReportController {
             Model model,
             Authentication authentication
     ) {
+        AppUser currentUser = findCurrentUser(authentication.getName());
+
+        if (reportForm.getAccusedUserId() != null
+                && reportForm.getAccusedUserId().equals(currentUser.getId())) {
+            bindingResult.rejectValue(
+                    "accusedUserId",
+                    "report.accusedUser.self",
+                    "Nie możesz zgłosić siebie"
+            );
+        }
+
         if (bindingResult.hasErrors()) {
-            addFormLists(model);
+            addFormLists(model, authentication.getName());
             return "reports/form";
         }
 
-        Report report = toEntity(reportForm, authentication.getName());
+        Report report = toEntity(reportForm, currentUser);
+        ensureShareToken(report);
         reportRepository.save(report);
         return "redirect:/reports";
     }
@@ -148,7 +161,7 @@ public class ReportController {
         }
 
         model.addAttribute("reportForm", toForm(report));
-        addFormLists(model);
+        addFormLists(model, authentication.getName());
         return "reports/form";
     }
 
@@ -170,6 +183,9 @@ public class ReportController {
         Report report = reportRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono donosu o id: " + id));
 
+        if (ensureShareToken(report)) {
+            report = reportRepository.save(report);
+        }
 
         model.addAttribute("report", report);
         return "reports/detail";
@@ -184,8 +200,13 @@ public class ReportController {
         return isAdmin || isAuthor;
     }
 
-    private void addFormLists(Model model) {
+    private void addFormLists(Model model, String currentUsername) {
+        List<AppUser> users = appUserRepository.findAll().stream()
+                .filter(user -> !user.getUsername().equals(currentUsername))
+                .toList();
+
         model.addAttribute("paragraphs", paragraphRepository.findAll());
+        model.addAttribute("users", users);
         model.addAttribute("statuses", ReportStatus.values());
     }
     private void addCookie(HttpServletResponse response, String name, String value) {
@@ -242,9 +263,12 @@ public class ReportController {
         form.setId(report.getId());
         form.setTitle(report.getTitle());
         form.setDescription(report.getDescription());
-        form.setAccusedStudentName(report.getAccusedStudentName());
         form.setEventDate(report.getEventDate());
         form.setStatus(report.getStatus());
+
+        if (report.getAccusedUser() != null) {
+            form.setAccusedUserId(report.getAccusedUser().getId());
+        }
 
         if (report.getAuthor() != null) {
             form.setAuthorId(report.getAuthor().getId());
@@ -257,7 +281,21 @@ public class ReportController {
         return form;
     }
 
-    private Report toEntity(ReportForm form, String username) {
+    private AppUser findCurrentUser(String username) {
+        return appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono zalogowanego użytkownika: " + username));
+    }
+
+    private boolean ensureShareToken(Report report) {
+        if (report.getShareToken() != null && !report.getShareToken().isBlank()) {
+            return false;
+        }
+
+        report.setShareToken(UUID.randomUUID().toString());
+        return true;
+    }
+
+    private Report toEntity(ReportForm form, AppUser currentUser) {
         Report report;
 
         if (form.getId() != null) {
@@ -269,18 +307,19 @@ public class ReportController {
 
         report.setTitle(form.getTitle());
         report.setDescription(form.getDescription());
-        report.setAccusedStudentName(form.getAccusedStudentName());
         report.setEventDate(form.getEventDate());
         report.setStatus(form.getStatus() != null ? form.getStatus() : ReportStatus.NEW);
+
+        AppUser accusedUser = appUserRepository.findById(form.getAccusedUserId())
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono zgłaszanego użytkownika o id: " + form.getAccusedUserId()));
+        report.setAccusedUser(accusedUser);
 
         if (report.getCreatedAt() == null) {
             report.setCreatedAt(LocalDate.now());
         }
 
         if (report.getAuthor() == null) {
-            AppUser author = appUserRepository.findByUsername(username)
-                    .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono zalogowanego użytkownika: " + username));
-            report.setAuthor(author);
+            report.setAuthor(currentUser);
         }
 
         Paragraph paragraph = paragraphRepository.findById(form.getParagraphId())

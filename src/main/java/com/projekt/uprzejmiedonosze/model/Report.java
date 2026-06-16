@@ -29,9 +29,10 @@ public class Report {
     @Column(nullable = false, length = 1000)
     private String description;
 
-    @NotBlank(message = "Imię i nazwisko zgłaszanego studenta jest wymagane")
-    @Size(min = 3, max = 80)
-    private String accusedStudentName;
+    @NotNull(message = "Zgłaszany użytkownik jest wymagany")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "accused_user_id", nullable = false)
+    private AppUser accusedUser;
 
     @PastOrPresent(message = "Data przewinienia nie może być z przyszłości")
     @NotNull(message = "Data nie może być pusta")

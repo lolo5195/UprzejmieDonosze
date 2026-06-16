@@ -27,9 +27,8 @@ public class ReportForm {
     @Size(min = 10, max = 1000, message = "Opis musi mieć od 10 do 1000 znaków")
     private String description;
 
-    @NotBlank(message = "Imię i nazwisko zgłaszanego studenta jest wymagane")
-    @Size(min = 3, max = 80, message = "Imię i nazwisko musi mieć od 3 do 80 znaków")
-    private String accusedStudentName;
+    @NotNull(message = "Zgłaszany użytkownik jest wymagany")
+    private Long accusedUserId;
 
     @PastOrPresent(message = "Data przewinienia nie może być z przyszłości")
     @NotNull(message = "Data nie może być pusta")
