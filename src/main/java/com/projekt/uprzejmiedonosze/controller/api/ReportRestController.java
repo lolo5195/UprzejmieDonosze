@@ -86,7 +86,8 @@ public class ReportRestController {
         Report report = reportRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono donosu"));
 
-        fillReportFromRequest(report, request, authentication);
+        ensureCanModifyReport(report, authentication);
+        fillReportFromRequest(report, request, authentication, false);
 
         Report savedReport = reportRepository.save(report);
 
@@ -94,17 +95,26 @@ public class ReportRestController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReport(@PathVariable Long id) {
-        if (!reportRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono donosu");
-        }
+    public ResponseEntity<Void> deleteReport(@PathVariable Long id, Authentication authentication) {
+        Report report = reportRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nie znaleziono donosu"));
 
-        reportRepository.deleteById(id);
+        ensureCanModifyReport(report, authentication);
+        reportRepository.delete(report);
 
         return ResponseEntity.noContent().build();
     }
 
     private void fillReportFromRequest(Report report, ReportRequest request, Authentication authentication) {
+        fillReportFromRequest(report, request, authentication, true);
+    }
+
+    private void fillReportFromRequest(
+            Report report,
+            ReportRequest request,
+            Authentication authentication,
+            boolean updateAuthor
+    ) {
         AppUser author = appUserRepository.findByUsername(authentication.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono zalogowanego użytkownika"));
 
@@ -126,7 +136,9 @@ public class ReportRestController {
         report.setDescription(request.description());
         report.setAccusedUser(accusedUser);
         report.setEventDate(request.eventDate());
-        report.setAuthor(author);
+        if (updateAuthor) {
+            report.setAuthor(author);
+        }
         report.setParagraph(paragraph);
 
         if (request.status() != null) {
@@ -134,6 +146,23 @@ public class ReportRestController {
         } else if (report.getStatus() == null) {
             report.setStatus(ReportStatus.NEW);
         }
+    }
+
+    private void ensureCanModifyReport(Report report, Authentication authentication) {
+        if (!canModifyReport(report, authentication)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Brak uprawnień do modyfikacji tego donosu");
+        }
+    }
+
+    private boolean canModifyReport(Report report, Authentication authentication) {
+        return isAdmin(authentication)
+                || report.getAuthor() != null
+                && report.getAuthor().getUsername().equals(authentication.getName());
+    }
+
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
     }
 
     private ReportResponse toResponse(Report report) {
