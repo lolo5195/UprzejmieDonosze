@@ -33,6 +33,20 @@
     <a class="btn" th:href="@{/profile/edit}">Edytuj dane</a>
 </section>
 
+<section class="card">
+    <h2>Statystyki</h2>
+    <dl class="details-list">
+        <div>
+            <dt>Złożone donosy</dt>
+            <dd th:text="${userStats.submittedCount}"></dd>
+        </div>
+        <div>
+            <dt>Otrzymane donosy</dt>
+            <dd th:text="${userStats.receivedCount}"></dd>
+        </div>
+    </dl>
+</section>
+
 <section class="card" th:object="${changePasswordForm}">
     <h2>Zmiana hasła</h2>
     <div class="alert alert-error" role="alert" th:if="${#fields.hasAnyErrors()}">

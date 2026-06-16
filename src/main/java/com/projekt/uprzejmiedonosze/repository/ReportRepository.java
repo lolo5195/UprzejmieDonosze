@@ -18,6 +18,8 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     List<Report> findByStatus(ReportStatus status, Sort sort);
 
+    long countByStatus(ReportStatus status);
+
     List<Report> findByParagraphId(Long paragraphId, Sort sort);
 
     List<Report> findAll(Sort sort);
