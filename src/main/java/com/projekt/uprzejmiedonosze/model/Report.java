@@ -29,8 +29,9 @@ public class Report {
     @Column(nullable = false, length = 1000)
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "accused_user_id")
+    @NotNull(message = "Zgłaszany użytkownik jest wymagany")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "accused_user_id", nullable = false)
     private AppUser accusedUser;
 
     @PastOrPresent(message = "Data przewinienia nie może być z przyszłości")
