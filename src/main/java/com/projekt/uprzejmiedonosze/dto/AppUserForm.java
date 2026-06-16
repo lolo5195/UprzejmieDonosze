@@ -19,8 +19,6 @@ public class AppUserForm {
     @Size(min = 3, max = 50, message = "Login musi mieć od 3 do 50 znaków")
     private String username;
 
-    @NotBlank(message = "Hasło jest wymagane")
-    @Size(min = 6, message = "Hasło musi mieć co najmniej 6 znaków")
     private String password;
 
     @NotBlank(message = "Imię jest wymagane")

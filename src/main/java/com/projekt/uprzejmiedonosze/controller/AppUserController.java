@@ -44,6 +44,8 @@ public class AppUserController {
             BindingResult bindingResult,
             Model model
     ) {
+        validatePasswordForNewUser(userForm, bindingResult);
+
         if (bindingResult.hasErrors()) {
             addFormLists(model);
             return "users/form";
@@ -93,10 +95,10 @@ public class AppUserController {
                     .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono użytkownika o id: " + form.getId()));
         } else {
             user = new AppUser();
+            user.setPassword(passwordEncoder.encode(form.getPassword()));
         }
 
         user.setUsername(form.getUsername());
-        user.setPassword(passwordEncoder.encode(form.getPassword()));
         user.setFirstName(form.getFirstName());
         user.setLastName(form.getLastName());
         user.setRole(form.getRole() != null ? form.getRole() : Role.USER);
@@ -106,5 +108,17 @@ public class AppUserController {
         }
 
         return user;
+    }
+
+    private void validatePasswordForNewUser(AppUserForm form, BindingResult bindingResult) {
+        if (form.getId() != null) {
+            return;
+        }
+
+        if (form.getPassword() == null || form.getPassword().isBlank()) {
+            bindingResult.rejectValue("password", "password.required", "Hasło jest wymagane");
+        } else if (form.getPassword().length() < 6) {
+            bindingResult.rejectValue("password", "password.size", "Hasło musi mieć co najmniej 6 znaków");
+        }
     }
 }
