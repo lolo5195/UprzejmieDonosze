@@ -79,7 +79,7 @@
             <tr th:each="report : ${reports}">
                 <td th:text="${report.id}"></td>
                 <td th:text="${report.title}"></td>
-                <td th:text="${report.accusedStudentName}"></td>
+                <td th:text="${report.accusedUser != null ? report.accusedUser.username + ((report.accusedUser.firstName != null or report.accusedUser.lastName != null) ? ' - ' + (report.accusedUser.firstName != null ? report.accusedUser.firstName : '') + ' ' + (report.accusedUser.lastName != null ? report.accusedUser.lastName : '') : '') : '-'}"></td>
                 <td th:text="${report.paragraph != null ? report.paragraph.title : '-'}"></td>
                 <td th:text="${report.author != null ? report.author.username : '-'}"></td>
                 <td th:text="${report.eventDate}"></td>

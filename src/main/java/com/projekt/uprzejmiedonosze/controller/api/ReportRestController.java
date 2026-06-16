@@ -100,15 +100,22 @@ public class ReportRestController {
     }
 
     private void fillReportFromRequest(Report report, ReportRequest request) {
+        if (request.authorId().equals(request.accusedUserId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie możesz zgłosić siebie");
+        }
+
         AppUser author = appUserRepository.findById(request.authorId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono autora"));
+
+        AppUser accusedUser = appUserRepository.findById(request.accusedUserId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono zgłaszanego użytkownika"));
 
         Paragraph paragraph = paragraphRepository.findById(request.paragraphId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nie znaleziono paragrafu"));
 
         report.setTitle(request.title());
         report.setDescription(request.description());
-        report.setAccusedStudentName(request.accusedStudentName());
+        report.setAccusedUser(accusedUser);
         report.setEventDate(request.eventDate());
         report.setAuthor(author);
         report.setParagraph(paragraph);
@@ -121,11 +128,15 @@ public class ReportRestController {
     }
 
     private ReportResponse toResponse(Report report) {
+        AppUser accusedUser = report.getAccusedUser();
+
         return new ReportResponse(
                 report.getId(),
                 report.getTitle(),
                 report.getDescription(),
-                report.getAccusedStudentName(),
+                accusedUser != null ? accusedUser.getId() : null,
+                accusedUser != null ? accusedUser.getUsername() : null,
+                formatFullName(accusedUser),
                 report.getEventDate(),
                 report.getCreatedAt(),
                 report.getStatus(),
@@ -134,6 +145,18 @@ public class ReportRestController {
                 report.getParagraph() != null ? report.getParagraph().getId() : null,
                 report.getParagraph() != null ? report.getParagraph().getTitle() : null
         );
+    }
+
+    private String formatFullName(AppUser user) {
+        if (user == null) {
+            return null;
+        }
+
+        String firstName = user.getFirstName() != null ? user.getFirstName() : "";
+        String lastName = user.getLastName() != null ? user.getLastName() : "";
+        String fullName = (firstName + " " + lastName).trim();
+
+        return fullName.isBlank() ? null : fullName;
     }
 
     public record ReportRequest(
@@ -145,9 +168,8 @@ public class ReportRestController {
             @Size(min = 10, max = 1000, message = "Opis musi mieć od 10 do 1000 znaków")
             String description,
 
-            @NotBlank(message = "Imię i nazwisko oskarżonego studenta jest wymagane")
-            @Size(min = 3, max = 80, message = "Dane studenta muszą mieć od 3 do 80 znaków")
-            String accusedStudentName,
+            @NotNull(message = "Zgłaszany użytkownik jest wymagany")
+            Long accusedUserId,
 
             @PastOrPresent(message = "Data zdarzenia nie może być z przyszłości")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -167,7 +189,9 @@ public class ReportRestController {
             Long id,
             String title,
             String description,
-            String accusedStudentName,
+            Long accusedUserId,
+            String accusedUsername,
+            String accusedFullName,
             LocalDate eventDate,
             LocalDate createdAt,
             ReportStatus status,

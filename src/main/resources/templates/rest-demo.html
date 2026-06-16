@@ -97,7 +97,7 @@
 
             addCell(row, report.id);
             addCell(row, report.title);
-            addCell(row, report.accusedStudentName);
+            addCell(row, report.accusedFullName ?? report.accusedUsername);
             addCell(row, report.eventDate);
             addCell(row, report.status);
             addCell(row, report.paragraphTitle);

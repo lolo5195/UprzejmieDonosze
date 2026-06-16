@@ -13,7 +13,7 @@
     <dl class="details-list">
         <div>
             <dt>Zgłaszany student</dt>
-            <dd th:text="${report.accusedStudentName}">Jan Kowalski</dd>
+            <dd th:text="${report.accusedUser != null ? ((report.accusedUser.firstName != null or report.accusedUser.lastName != null) ? (report.accusedUser.firstName != null ? report.accusedUser.firstName : '') + ' ' + (report.accusedUser.lastName != null ? report.accusedUser.lastName : '') : report.accusedUser.username) : 'Brak'}">Jan Kowalski</dd>
         </div>
 
         <div>

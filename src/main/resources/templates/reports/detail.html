@@ -19,7 +19,7 @@
         </div>
         <div>
             <dt>Oskarżony student</dt>
-            <dd th:text="${report.accusedStudentName}"></dd>
+            <dd th:text="${report.accusedUser != null ? report.accusedUser.username + ((report.accusedUser.firstName != null or report.accusedUser.lastName != null) ? ' - ' + (report.accusedUser.firstName != null ? report.accusedUser.firstName : '') + ' ' + (report.accusedUser.lastName != null ? report.accusedUser.lastName : '') : '') : 'Brak'}"></dd>
         </div>
         <div>
             <dt>Paragraf</dt>

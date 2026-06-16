@@ -24,9 +24,15 @@
         </div>
 
         <div class="form-field">
-            <label for="accusedStudentName">Zgłaszany student</label>
-            <input id="accusedStudentName" type="text" th:field="*{accusedStudentName}">
-            <div class="field-error" th:if="${#fields.hasErrors('accusedStudentName')}" th:errors="*{accusedStudentName}"></div>
+            <label for="accusedUserId">Zgłaszany użytkownik</label>
+            <select id="accusedUserId" th:field="*{accusedUserId}">
+                <option value="">-- wybierz użytkownika --</option>
+                <option th:each="user : ${users}"
+                        th:value="${user.id}"
+                        th:text="${user.username + ((user.firstName != null or user.lastName != null) ? ' - ' + (user.firstName != null ? user.firstName : '') + ' ' + (user.lastName != null ? user.lastName : '') : '')}">
+                </option>
+            </select>
+            <div class="field-error" th:if="${#fields.hasErrors('accusedUserId')}" th:errors="*{accusedUserId}"></div>
         </div>
 
         <div class="form-field">

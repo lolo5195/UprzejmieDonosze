@@ -60,6 +60,7 @@ class ParagraphEpicIntegrationTests {
         reportRepository.deleteAll();
         paragraphRepository.deleteAll();
         appUserRepository.findByUsername("reporter").ifPresent(appUserRepository::delete);
+        appUserRepository.findByUsername("accused").ifPresent(appUserRepository::delete);
     }
 
     @Test
@@ -145,11 +146,20 @@ class ParagraphEpicIntegrationTests {
             user.setRole(Role.USER);
             return appUserRepository.save(user);
         });
+        AppUser accused = appUserRepository.findByUsername("accused").orElseGet(() -> {
+            AppUser user = new AppUser();
+            user.setUsername("accused");
+            user.setPassword("sekret123");
+            user.setFirstName("Adam");
+            user.setLastName("Kowalski");
+            user.setRole(Role.USER);
+            return appUserRepository.save(user);
+        });
 
         Report report = new Report();
         report.setTitle("Donos testowy");
         report.setDescription("Opis donosu testowego powiązanego z paragrafem.");
-        report.setAccusedStudentName("Adam Kowalski");
+        report.setAccusedUser(accused);
         report.setEventDate(LocalDate.now());
         report.setAuthor(author);
         report.setParagraph(paragraph);
