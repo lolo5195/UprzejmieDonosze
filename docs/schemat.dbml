@@ -1,32 +1,41 @@
 Table app_users {
-  id number [pk]
-  username varchar(30) [not null, unique]
+  id bigint [pk, increment]
+
+  username varchar(50) [not null, unique]
   password varchar(255) [not null]
+
   first_name varchar(30) [not null]
-  last_name varchar(50) [not null]
-  role varchar(20) [not null, note: 'ADMIN, USER, GUEST']
-  created_at date
+  last_name varchar(30) [not null]
+
+  role varchar(20) [not null, note: 'USER lub ADMIN']
+  created_at date [not null]
 }
 
 Table paragraphs {
-  id number [pk]
+  id bigint [pk, increment]
+
   title varchar(60) [not null]
   description varchar(500) [not null]
-  severity number [not null, note: '1-10']
-  active boolean [not null]
+
+  severity int [not null, note: 'Wartość od 1 do 10']
+  active boolean [not null, default: true]
 }
 
 Table reports {
-  id number [pk]
+  id bigint [pk, increment]
+
   title varchar(80) [not null]
   description varchar(1000) [not null]
-  accused_user_id number [not null]
+
   event_date date
-  created_at date
-  status varchar(20) [not null, note: 'NEW, ACCEPTED, REJECTED']
+  created_at date [not null]
+
+  status varchar(20) [not null, note: 'NEW, ACCEPTED lub REJECTED']
   share_token varchar(255) [unique]
-  author_id number
-  paragraph_id number
+
+  author_id bigint [not null]
+  accused_user_id bigint [not null]
+  paragraph_id bigint [not null]
 }
 
 Ref: reports.author_id > app_users.id
