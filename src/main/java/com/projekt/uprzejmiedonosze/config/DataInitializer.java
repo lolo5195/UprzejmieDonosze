@@ -24,7 +24,7 @@ public class DataInitializer implements CommandLineRunner {
             AppUserRepository appUserRepository,
             PasswordEncoder passwordEncoder,
             @Value("${app.admin.username:admin}") String adminUsername,
-            @Value("${app.admin.password:admin123}") String adminPassword,
+            @Value("${app.admin.password}") String adminPassword,
             @Value("${app.admin.first-name:Administrator}") String adminFirstName,
             @Value("${app.admin.last-name:Systemu}") String adminLastName
     ) {
