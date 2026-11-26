@@ -1,5 +1,6 @@
 HELP.md
 *.md
+!README.md
 !docs/
 !docs/WCAG_CHECKLIST.md
 !.github/
@@ -36,3 +37,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Local secrets ###
+.env
